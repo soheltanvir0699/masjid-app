@@ -1,0 +1,210 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1">
+		
+		<title>Our Blog</title>
+		<!-- Loading third party fonts -->
+		<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,900" rel="stylesheet" type="text/css">
+		<link href="{% static "fonts/font-awesome.min.css"%}" rel="stylesheet" type="text/css">
+		<!-- Loading main css file -->
+		<link rel="stylesheet" href="{% static "style.css"%}">
+
+		<!--[if lt IE 9]>
+		<script src={% static "js/ie-support/html5.js"%}></script>
+		<script src={% static "js/ie-support/respond.js"%}></script>
+		<![endif]-->
+
+	</head>
+
+	<body>
+		
+		<div id="site-content">
+			<header class="site-header">
+				<div class="container">
+					<a href="index.html" id="branding">
+						<img src="dummy/logo.png" alt="Site Title">
+						<small class="site-description">Only Music</small>
+					</a> <!-- #branding -->
+					
+					<nav class="main-navigation">
+						<button type="button" class="toggle-menu"><i class="fa fa-bars"></i></button>
+						<ul class="menu">
+							<li class="menu-item"><a href="{% url 'Api_View:index' %}">Home</a></li>
+							<li class="menu-item"><a href="{% url 'Api_View:about' %}">About</a></li>
+							<li class="menu-item"><a href="{% url 'Api_View:gallery' %}">Gallery</a></li>
+							<li class="menu-item"><a href="{% url 'Api_View:download' %}">Download</a></li>
+							<li class="menu-item current-menu-item"><a href="{% url 'Api_View:blog' %}">Blog</a></li>
+							<li class="menu-item"><a href="{% url 'Api_View:contact' %}">Contact</a></li>
+						</ul> <!-- .menu -->
+					</nav> <!-- .main-navigation -->
+					<div class="mobile-menu"></div>
+				</div>
+			</header> <!-- .site-header -->
+			
+			<main class="main-content">
+				<div class="fullwidth-block inner-content">
+					<div class="container">
+						<div class="row">
+							<div class="col-md-7">
+								<div class="content">
+									<h2 class="entry-title">Blog</h2>
+
+									<div class="post">
+										<div class="entry-date">
+											<div class="date">23</div>
+											<span class="month">Jun</span>
+										</div>
+										<div class="featured-image">
+											<img src="dummy/Band Name/0e51a0e0-10e8-463a-8985-cf295b716375.jpg" alt="">
+										</div>
+										<h2 class="entry-title"><a href="#">Sed et persipiatis unde omnis iste natus</a></h2>
+										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Obcaecati officia quo dicta, similique, reiciendis beatae enim adipisci voluptates molestiae iusto, totam harum aliquid. Non officiis nobis, ut nesciunt eligendi asperiores.</p>
+										<a href="#">Read more</a>
+									</div>
+
+									<div class="post">
+										<div class="entry-date">
+											<div class="date">23</div>
+											<span class="month">Jun</span>
+										</div>
+										<div class="featured-image">
+											<img src="dummy/Band Name/650238-rock-music-picture.jpg" alt="">
+										</div>
+										<h2 class="entry-title"><a href="#">Consectetur adipisicing elit</a></h2>
+										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Obcaecati officia quo dicta, similique, reiciendis beatae enim adipisci voluptates molestiae iusto, totam harum aliquid. Non officiis nobis, ut nesciunt eligendi asperiores.</p>
+										<a href="#">Read more</a>
+									</div>
+
+									<div class="post">
+										<div class="entry-date">
+											<div class="date">23</div>
+											<span class="month">Jun</span>
+										</div>
+										<div class="featured-image">
+											<img src="dummy/Band Name/635999184041758451-974082916_Live-music-bg.jpg" alt="">
+										</div>
+										<h2 class="entry-title"><a href="#">Adipisci voluptates molestiae iusto</a></h2>
+										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Obcaecati officia quo dicta, similique, reiciendis beatae enim adipisci voluptates molestiae iusto, totam harum aliquid. Non officiis nobis, ut nesciunt eligendi asperiores.</p>
+										<a href="#">Read more</a>
+									</div>
+
+									<div class="post">
+										<div class="entry-date">
+											<div class="date">23</div>
+											<span class="month">Jun</span>
+										</div>
+										<div class="featured-image">
+											<img src="dummy/Band Name/Live-music-taskforce.jpg" alt="">
+										</div>
+										<h2 class="entry-title"><a href="#">Obcaecati officia quo dicta</a></h2>
+										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Obcaecati officia quo dicta, similique, reiciendis beatae enim adipisci voluptates molestiae iusto, totam harum aliquid. Non officiis nobis, ut nesciunt eligendi asperiores.</p>
+										<a href="#">Read more</a>
+									</div>
+
+									<div class="post">
+										<div class="entry-date">
+											<div class="date">23</div>
+											<span class="month">Jun</span>
+										</div>
+										<div class="featured-image">
+											<img src="dummy/Band Name/858431-music-wallpaper.jpg" alt="">
+										</div>
+										<h2 class="entry-title"><a href="#">Nesciunt eligendi asperiores</a></h2>
+										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Obcaecati officia quo dicta, similique, reiciendis beatae enim adipisci voluptates molestiae iusto, totam harum aliquid. Non officiis nobis, ut nesciunt eligendi asperiores.</p>
+										<a href="#">Read more</a>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4 col-md-push-1">
+								<aside class="sidebar">
+									<div class="widget">
+										<h3 class="widget-title">Discography</h3>
+										<ul class="discography-list">
+											<li>
+												<figure class="cover"><img src="dummy/thumbnail-1.jpg" alt="thumbnail 1"></figure>
+												<div class="detail">
+													<h3><a href="#">Deserunt mollitia animi</a></h3>
+													<span class="year">2016</span>
+													<span class="track">17 tracks</span>
+												</div>
+											</li>
+											<li>
+												<figure class="cover"><img src="dummy/thumbnail-2.jpg" alt="thumbnail 2"></figure>
+												<div class="detail">
+													<h3><a href="#">Deserunt mollitia animi</a></h3>
+													<span class="year">2016</span>
+													<span class="track">17 tracks</span>
+												</div>
+											</li>
+											<li>
+												<figure class="cover"><img src="dummy/thumbnail-3.jpg" alt="thumbnail 3"></figure>
+												<div class="detail">
+													<h3><a href="#">Deserunt mollitia animi</a></h3>
+													<span class="year">2016</span>
+													<span class="track">17 tracks</span>
+												</div>
+											</li>
+											<li>
+												<figure class="cover"><img src="dummy/thumbnail-4.jpg" alt="thumbnail 4"></figure>
+												<div class="detail">
+													<h3><a href="#">Deserunt mollitia animi</a></h3>
+													<span class="year">2016</span>
+													<span class="track">17 tracks</span>
+												</div>
+											</li>
+											<li>
+												<figure class="cover"><img src="dummy/thumbnail-5.jpg" alt="thumbnail 5"></figure>
+												<div class="detail">
+													<h3><a href="#">Deserunt mollitia animi</a></h3>
+													<span class="year">2016</span>
+													<span class="track">17 tracks</span>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</aside>
+							</div>
+						</div>
+					</div>
+				</div> <!-- .testimonial-section -->
+
+				
+			</main> <!-- .main-content -->
+
+			<footer class="site-footer">
+				<div class="container">
+					<img src="dummy/logo-footer.png" alt="Site Name">
+					
+					<address>
+						<p>50, Thiruvoodal Street, Thiruvannamalai. <br><a href="tel:9488487853">+91 94884 87853</a> <br> <a href="mailto:srikrishnacommunication55@gmail.com">srikrishnacommunication55@gmail.com</a></p> 
+					</address> 
+					
+					<form action="#" class="newsletter-form">
+						<input type="email" placeholder="Enter your email to join newsletter...">
+						<input type="submit" class="button cut-corner" value="Subscribe">
+					</form> <!-- .newsletter-form -->
+					
+					<div class="social-links">
+						<a href="#"><i class="fa fa-facebook-square"></i></a>
+						<a href="#"><i class="fa fa-twitter"></i></a>
+						<a href="#"><i class="fa fa-google-plus"></i></a>
+						<a href="#"><i class="fa fa-pinterest"></i></a>
+					</div> <!-- .social-links -->
+					
+					<p class="copy">Band Name @ Copyright 2016. All right reserved. Designed by <a href="http://srikrishnacommunication.com/Giridesigns.html">Giri Designs</a></p>
+				</div>
+			</footer> <!-- .site-footer -->
+
+		</div> <!-- #site-content -->
+
+		<script src={% static "js/jquery-1.11.1.min.js"%}></script>
+		<script src={% static "js/plugins.js"%}></script>
+		<script src={% static "js/app.js"%}></script>
+		
+	</body>
+
+</html>

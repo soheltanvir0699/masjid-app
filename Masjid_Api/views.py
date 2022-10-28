@@ -1,0 +1,233 @@
+from django.contrib import auth
+from django.core.mail import send_mail
+from django.db.models import Sum, Avg, Max, Min
+from django.http import HttpResponse, JsonResponse, response
+from urllib.parse import urlparse, parse_qs
+from django.db.models import Q
+from datetime import datetime
+from django.contrib.auth.hashers import make_password
+from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import api_view, permission_classes
+from django.shortcuts import get_object_or_404
+from rest_framework.parsers import JSONParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
+from .models import User_model, Salat_Time_List, Favorite_Time_List
+from .serializers import LoginSerializer, SingleUserSerializer, UserSerializer, Salat_Times_Serializer, Fav_Serializer
+
+
+# Create your views here.
+
+class LoginView(APIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        try:
+            user = User_model.object.get(email=request.data['username'])
+            print(user)
+            invalidate_token = Token.objects.filter(user=user)
+            print(invalidate_token)
+            invalidate_token.delete()
+        except:
+            print('token not found')
+
+        serializer = self.serializer_class(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+
+            try:
+                # auth.authenticate(username=serializer.data['username'], password=serializer.data['password'])
+                user = User_model.object.get(email=serializer.data['username'])
+                token = Token.objects.create(user=user)
+                response = {}
+                response['success'] = True
+                response['user'] = SingleUserSerializer(user, context={'request': request}).data
+                response['token'] = token.key
+            except:
+                response = {}
+                response['success'] = False
+
+            return Response(response, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def create_auth(request):
+    serialized = UserSerializer(data=request.data)
+    if serialized.is_valid():
+        User_model.object.create(name=serialized.data['name'],
+                                 email=serialized.data['email'],
+                                 username=serialized.data['username'],
+                                 password=make_password(serialized.data['password']),
+                                 is_creator=serialized.data['is_creator'], image=request.data["image"])
+        response = {}
+        response['success'] = True
+        response['data'] = serialized.data
+        return Response(response, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        try:
+            token = request.META['HTTP_AUTHORIZATION'].split(" ")[1]
+            print(token)
+            invalidate_token = Token.objects.filter(key=token, user=request.user)
+            invalidate_token.delete()
+            return Response({"success": True, "message": "Logged out"}, status=status.HTTP_202_ACCEPTED)
+        # Token shfajshaifsiue548747382dfsihfs87e8wfshfw8e7wisfhicsh8r8r7.split(" ")
+
+        except:
+            return Response({"success": False, "message": "Token does not exist!"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AddToFavView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        try:
+            salat_Id = request.data["salat_Id"]
+        except:
+            return Response({"success": False, "message": "Salat id Not found"})
+        try:
+            is_fav = request.data["is_default"]
+        except:
+            is_fav = False
+
+        try:
+            salat_data = Salat_Time_List.objects.get(id=salat_Id)
+        except:
+            return Response({"success": False, "message": "Salat Object Not found"})
+        if is_fav != False:
+            all_default_list = Favorite_Time_List.objects.filter(user_id=request.user, is_default=True)
+            for data in all_default_list:
+                data.is_default = False
+                data.save()
+
+        try:
+
+            Fav_Data = Favorite_Time_List.objects.get(salat_Id=salat_data, user_id=request.user)
+            Fav_Data.is_default = is_fav
+            Fav_Data.save()
+        except:
+            Fav_Data = Favorite_Time_List.objects.create(salat_Id=salat_data, user_id=request.user, is_default=is_fav)
+        try:
+            ser = Fav_Serializer(Fav_Data, context={'request': request}, many=False)
+            return Response({"success": True, "message": "Added to Favorite successful", "data": ser.data},
+                            status=status.HTTP_202_ACCEPTED)
+
+        except:
+            return Response({"success": False, "message": "Added to Favorite unsuccessful"})
+
+    def get(self, request, **kwargs):
+
+        try:
+            fav_list = Favorite_Time_List.objects.filter(user_id=request.user)
+            ser = Fav_Serializer(fav_list, context={'request': request}, many=True)
+            return Response({"success": True, "message": "get data successful", "data": ser.data},
+                            status=status.HTTP_202_ACCEPTED)
+
+        except:
+            return Response({"success": False, "message": "get data unsuccessful"})
+
+
+class All_Masjid_View(APIView):
+
+    def get(self, request, **kwargs):
+        try:
+            masjid = Salat_Time_List.objects.all()
+            serializer = Salat_Times_Serializer(masjid, context={'request': request}, many=True)
+            print(masjid)
+            return Response({"success": True, "message": "Data get successful.", "data": serializer.data},
+                            status=status.HTTP_202_ACCEPTED)
+        # Token shfajshaifsiue548747382dfsihfs87e8wfshfw8e7wisfhicsh8r8r7.split(" ")
+
+        except:
+            return Response({"success": False, "message": "Data get unsuccessful."})
+
+
+class Search_Masjid_View(APIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
+
+    def get(self, request, **kwargs):
+        try:
+            keyword = request.GET.get('keyword', '!!!!')
+            print(keyword)
+            masjid = Salat_Time_List.objects.filter(Q(mosque_name__icontains=keyword))
+            serializer = Salat_Times_Serializer(masjid, context={'request': request}, many=True)
+            print(masjid)
+            return Response({"success": True, "message": "Data get successful.", "data": serializer.data},
+                            status=status.HTTP_202_ACCEPTED)
+        # Token shfajshaifsiue548747382dfsihfs87e8wfshfw8e7wisfhicsh8r8r7.split(" ")
+
+        except:
+            return Response({"success": False, "message": "Data get unsuccessful."})
+
+
+class Salat_Times(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        print(request.user.id)
+        user = User_model.object.get(id=request.user.id)
+        try:
+            fajr_date = datetime.strptime(request.data['Fajr'], "%Y-%m-%d %H:%M:%S")
+        except:
+            return Response({"success": False, "message": "Fajr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            dhuhr_date = datetime.strptime(request.data['Dhuhr'], "%Y-%m-%d %H:%M:%S")
+        except:
+            return Response({"success": False, "message": "Dhuhr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            asr_date = datetime.strptime(request.data['Asr'], "%Y-%m-%d %H:%M:%S")
+        except:
+            return Response({"success": False, "message": "Asr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            maghrib_date = datetime.strptime(request.data['Maghrib'], "%Y-%m-%d %H:%M:%S")
+        except:
+            return Response({"success": False, "message": "Maghrib time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            isha_date = datetime.strptime(request.data['Isha'], "%Y-%m-%d %H:%M:%S")
+        except:
+            return Response({"success": False, "message": "Isha time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            Sunrise = datetime.strptime(request.data['Sunrise'], "%Y-%m-%d %H:%M:%S")
+        except:
+            Sunrise = None
+        try:
+            Sunset = datetime.strptime(request.data['Sunset'], "%Y-%m-%d %H:%M:%S")
+        except:
+            Sunset = None
+        try:
+            mosque_name = request.data['mosque_name']
+        except:
+            return Response({"success": False, "message": "Mosque name is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            mosque_icon = request.data['mosque_icon']
+        except:
+            mosque_icon = None
+
+        time_sa = Salat_Time_List.objects.create(mosque_name=mosque_name, mosque_icon=mosque_icon, user_id=user,
+                                                 Fajr=fajr_date, Sunrise=Sunrise, Dhuhr=dhuhr_date, Asr=asr_date,
+                                                 Sunset=Sunset, Maghrib=maghrib_date, Isha=isha_date)
+        time_sa.save()
+        serializer_data = Salat_Times_Serializer(time_sa, context={'request': request}, many=False)
+        return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
+                        status=status.HTTP_202_ACCEPTED)
+
+    def get(self, request, **kwargs):
+        user = User_model.object.get(id=request.user.id)
+        salatData = Salat_Time_List.objects.filter(user_id=user)
+        serializer = Salat_Times_Serializer(salatData, context={'request': request}, many=True)
+        return Response({"success": True, "data": serializer.data}, status=status.HTTP_202_ACCEPTED)
