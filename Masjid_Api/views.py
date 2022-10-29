@@ -184,7 +184,7 @@ class AddToFavView(APIView):
 
 class All_Masjid_View(APIView):
 
-    def get(self, request, **kwargs):
+    def post(self, request, **kwargs):
         try:
             email = request.data['email'].lower()
         except:
@@ -205,7 +205,7 @@ class Search_Masjid_View(APIView):
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]
 
-    def get(self, request, **kwargs):
+    def post(self, request, **kwargs):
         try:
             email = request.data['email'].lower()
         except:
