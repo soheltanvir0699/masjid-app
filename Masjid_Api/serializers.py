@@ -47,9 +47,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class Salat_Times_Serializer(serializers.ModelSerializer):
+    is_add_fav = serializers.SerializerMethodField()
     class Meta:
         model = Salat_Time_List
         fields = '__all__'
+
+    def get_is_add_fav(self, obj):
+        try:
+            user = User_model.objects.get(email=self.context['email'])
+            subs = Favorite_Time_List.objects.get(salat_Id=obj, user_id=user)
+            return True
+        except:
+            return False
 
 class Fav_Serializer(serializers.ModelSerializer):
     salat_Id = serializers.SerializerMethodField()

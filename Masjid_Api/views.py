@@ -186,8 +186,12 @@ class All_Masjid_View(APIView):
 
     def get(self, request, **kwargs):
         try:
+            email = request.data['email'].lower()
+        except:
+            email = ""
+        try:
             masjid = Salat_Time_List.objects.all()
-            serializer = Salat_Times_Serializer(masjid, context={'request': request}, many=True)
+            serializer = Salat_Times_Serializer(masjid, context={'request': request, 'email': email}, many=True)
             print(masjid)
             return Response({"success": True, "message": "Data get successful.", "data": serializer.data},
                             status=status.HTTP_202_ACCEPTED)
@@ -203,10 +207,15 @@ class Search_Masjid_View(APIView):
 
     def get(self, request, **kwargs):
         try:
+            email = request.data['email'].lower()
+        except:
+            email = ""
+
+        try:
             keyword = request.GET.get('keyword', '!!!!')
             print(keyword)
             masjid = Salat_Time_List.objects.filter(Q(mosque_name__icontains=keyword))
-            serializer = Salat_Times_Serializer(masjid, context={'request': request}, many=True)
+            serializer = Salat_Times_Serializer(masjid, context={'request': request, 'email': email}, many=True)
             print(masjid)
             return Response({"success": True, "message": "Data get successful.", "data": serializer.data},
                             status=status.HTTP_202_ACCEPTED)
