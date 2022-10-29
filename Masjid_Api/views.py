@@ -89,6 +89,49 @@ class LogoutView(APIView):
             return Response({"success": False, "message": "Token does not exist!"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class RemoveWithSalatToFavView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        try:
+            salat_Id = request.data["salat_Id"]
+        except:
+            return Response({"success": False, "message": "Salat id Not found"})
+        try:
+            salat_data = Salat_Time_List.objects.get(id=salat_Id)
+        except:
+            return Response({"success": False, "message": "Salat Object Not found"})
+        try:
+            fav_data = Favorite_Time_List.objects.get(user_id=request.user, salat_Id=salat_data)
+            fav_data.delete()
+            return Response({"success": True, "message": "Remove to Favorite successful"},
+                            status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response({"success": False, "message": "Remove to Favorite Unsuccessful"},
+                            status=status.HTTP_202_ACCEPTED)
+
+
+class RemoveWithFavToFavView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        try:
+            fav_id = request.data["fav_id"]
+        except:
+            return Response({"success": False, "message": "Favorite id Not found"})
+
+        try:
+            fav_data = Favorite_Time_List.objects.get(id=fav_id)
+            fav_data.delete()
+            return Response({"success": True, "message": "Remove to Favorite successful"},
+                            status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response({"success": False, "message": "Remove to Favorite Unsuccessful"},
+                            status=status.HTTP_202_ACCEPTED)
+
+
 class AddToFavView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -114,7 +157,6 @@ class AddToFavView(APIView):
                 data.save()
 
         try:
-
             Fav_Data = Favorite_Time_List.objects.get(salat_Id=salat_data, user_id=request.user)
             Fav_Data.is_default = is_fav
             Fav_Data.save()

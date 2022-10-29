@@ -17,5 +17,7 @@ urlpatterns = [
     path(r'api/search-masjid/', views.Search_Masjid_View.as_view(), name='search_masjid'),
     path(r'api/all-masjid/', views.All_Masjid_View.as_view(), name='all_masjid'),
     path(r'api/fav-masjid/', views.AddToFavView.as_view(), name='addtofav'),
+    path(r'api/remove-fav-salat/', views.RemoveWithSalatToFavView.as_view(), name='removeFavSalatid'),
+    path(r'api/remove-fav-fav/', views.RemoveWithFavToFavView.as_view(), name='removeFavFav'),
 
 ]
