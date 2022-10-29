@@ -54,7 +54,7 @@ class Salat_Times_Serializer(serializers.ModelSerializer):
 
     def get_is_add_fav(self, obj):
         try:
-            user = User_model.objects.get(email=self.context['email'])
+            user = User_model.object.get(email=self.context['email'])
             subs = Favorite_Time_List.objects.get(salat_Id=obj, user_id=user)
             return True
         except:
