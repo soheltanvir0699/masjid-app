@@ -30,7 +30,7 @@ class SingleUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User_model
-        fields = ('name', 'email', 'username', 'phone', 'address', 'image',)
+        fields = ('name', 'email', 'username', 'phone', 'address', 'image', 'is_creator',)
 
     def get_image_url(self, obj):
         if obj.image:
