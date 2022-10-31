@@ -111,6 +111,24 @@ class RemoveWithSalatToFavView(APIView):
             return Response({"success": False, "message": "Remove to Favorite Unsuccessful"},
                             status=status.HTTP_202_ACCEPTED)
 
+class RemoveMasjidView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        try:
+            salat_Id = request.data["salat_Id"]
+        except:
+            return Response({"success": False, "message": "Masjid id Not found"})
+        try:
+            salat_data = Salat_Time_List.objects.get(id=salat_Id)
+            salat_data.delete()
+            return Response({"success": True, "message": "Remove Masjid successful"},
+                            status=status.HTTP_200_OK)
+        except:
+            return Response({"success": False, "message": "Masjid Object Not found"})
+
+
 
 class RemoveWithFavToFavView(APIView):
     authentication_classes = [TokenAuthentication]
