@@ -251,31 +251,31 @@ class Salat_Times(APIView):
         print(request.user.id)
         user = User_model.object.get(id=request.user.id)
         try:
-            fajr_date = datetime.strptime(request.data['Fajr'], "%Y-%m-%d %H:%M:%S")
+            fajr_date = request.data['Fajr']
         except:
             return Response({"success": False, "message": "Fajr time is empty."}, status=status.HTTP_202_ACCEPTED)
         try:
-            dhuhr_date = datetime.strptime(request.data['Dhuhr'], "%Y-%m-%d %H:%M:%S")
+            dhuhr_date = request.data['Dhuhr']
         except:
             return Response({"success": False, "message": "Dhuhr time is empty."}, status=status.HTTP_202_ACCEPTED)
         try:
-            asr_date = datetime.strptime(request.data['Asr'], "%Y-%m-%d %H:%M:%S")
+            asr_date = request.data['Asr']
         except:
             return Response({"success": False, "message": "Asr time is empty."}, status=status.HTTP_202_ACCEPTED)
         try:
-            maghrib_date = datetime.strptime(request.data['Maghrib'], "%Y-%m-%d %H:%M:%S")
+            maghrib_date = request.data['Maghrib']
         except:
             return Response({"success": False, "message": "Maghrib time is empty."}, status=status.HTTP_202_ACCEPTED)
         try:
-            isha_date = datetime.strptime(request.data['Isha'], "%Y-%m-%d %H:%M:%S")
+            isha_date = request.data['Isha']
         except:
             return Response({"success": False, "message": "Isha time is empty."}, status=status.HTTP_202_ACCEPTED)
         try:
-            Sunrise = datetime.strptime(request.data['Sunrise'], "%Y-%m-%d %H:%M:%S")
+            Sunrise = request.data['Sunrise']
         except:
             Sunrise = None
         try:
-            Sunset = datetime.strptime(request.data['Sunset'], "%Y-%m-%d %H:%M:%S")
+            Sunset = request.data['Sunset']
         except:
             Sunset = None
         try:
