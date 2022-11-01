@@ -242,6 +242,61 @@ class Search_Masjid_View(APIView):
         except:
             return Response({"success": False, "message": "Data get unsuccessful."})
 
+class update_masjid(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        print(request.user.id)
+        try:
+            id = request.data['id']
+        except:
+            return Response({"success": False, "message": "Id is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            fajr_date = request.data['Fajr']
+        except:
+            return Response({"success": False, "message": "Fajr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            dhuhr_date = request.data['Dhuhr']
+        except:
+            return Response({"success": False, "message": "Dhuhr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            asr_date = request.data['Asr']
+        except:
+            return Response({"success": False, "message": "Asr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            maghrib_date = request.data['Maghrib']
+        except:
+            return Response({"success": False, "message": "Maghrib time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            isha_date = request.data['Isha']
+        except:
+            return Response({"success": False, "message": "Isha time is empty."}, status=status.HTTP_202_ACCEPTED)
+
+        try:
+            mosque_name = request.data['mosque_name']
+        except:
+            return Response({"success": False, "message": "Mosque name is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            mosque_icon = request.data['mosque_icon']
+        except:
+            mosque_icon = None
+
+        try:
+            current_masjid = Salat_Time_List.objects.get(id=id)
+        except:
+            return Response({"success": False, "message": "Masjid Not Found."}, status=status.HTTP_202_ACCEPTED)
+        current_masjid.mosque_name = mosque_name
+        current_masjid.mosque_icon = mosque_icon
+        current_masjid.Fajr = fajr_date
+        current_masjid.Dhuhr = dhuhr_date
+        current_masjid.Asr = asr_date
+        current_masjid.Maghrib = maghrib_date
+        current_masjid.Isha = isha_date
+        current_masjid.save()
+        serializer_data = Salat_Times_Serializer(current_masjid, context={'request': request}, many=False)
+        return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
+                        status=status.HTTP_202_ACCEPTED)
 
 class Salat_Times(APIView):
     authentication_classes = [TokenAuthentication]
