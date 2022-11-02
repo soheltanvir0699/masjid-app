@@ -162,7 +162,12 @@ class AddToFavView(APIView):
         try:
             is_fav = request.data["is_default"]
         except:
+            is_fav = "False"
+
+        if is_fav == "False":
             is_fav = False
+        else:
+            is_fav = True
 
         try:
             salat_data = Salat_Time_List.objects.get(id=salat_Id)
