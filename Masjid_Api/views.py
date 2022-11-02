@@ -181,6 +181,16 @@ class AddToFavView(APIView):
         except:
             Fav_Data = Favorite_Time_List.objects.create(salat_Id=salat_data, user_id=request.user, is_default=is_fav)
         try:
+            Fav_Data_fav = Favorite_Time_List.objects.filter(user_id=request.user, is_default=True)
+            if len(Fav_Data_fav) == 0:
+                try:
+                    Fav_Data.is_default = True
+                    Fav_Data.save()
+                except:
+                    print("")
+        except:
+            print("")
+        try:
             ser = Fav_Serializer(Fav_Data, context={'request': request}, many=False)
             return Response({"success": True, "message": "Added to Favorite successful", "data": ser.data},
                             status=status.HTTP_202_ACCEPTED)
