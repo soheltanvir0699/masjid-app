@@ -206,7 +206,7 @@ class AddToFavView(APIView):
     def get(self, request, **kwargs):
 
         try:
-            fav_list = Favorite_Time_List.objects.filter(user_id=request.user)
+            fav_list = Favorite_Time_List.objects.filter(user_id=request.user).distinct()
             ser = Fav_Serializer(fav_list, context={'request': request}, many=True)
             return Response({"success": True, "message": "get data successful", "data": ser.data},
                             status=status.HTTP_202_ACCEPTED)
