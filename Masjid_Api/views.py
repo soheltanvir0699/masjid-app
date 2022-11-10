@@ -4,8 +4,16 @@ from django.db.models import Sum, Avg, Max, Min
 from django.http import HttpResponse, JsonResponse, response
 from urllib.parse import urlparse, parse_qs
 from django.db.models import Q
+from django.shortcuts import render
 from datetime import datetime
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model
+from django.template.loader import render_to_string
+from django.utils.encoding import force_str, force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.sites.shortcuts import get_current_site
+from .tokens import account_activation_token
+from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, permission_classes
@@ -32,6 +40,8 @@ class LoginView(APIView):
             invalidate_token = Token.objects.filter(user=user)
             print(invalidate_token)
             invalidate_token.delete()
+            if not user.is_active:
+                return JsonResponse({"success": False, "message": 'Please check your email to verify your account..'})
         except:
             print('token not found')
 
@@ -45,6 +55,7 @@ class LoginView(APIView):
                 token = Token.objects.create(user=user)
                 response = {}
                 response['success'] = True
+                response['message'] = "sing in successful."
                 response['user'] = SingleUserSerializer(user, context={'request': request}).data
                 response['token'] = token.key
             except:
@@ -58,14 +69,32 @@ class LoginView(APIView):
 @api_view(['POST'])
 def create_auth(request):
     serialized = UserSerializer(data=request.data)
+    if User_model.object.filter(email=request.data['email']).exists():
+        return JsonResponse({"success": False, "message": 'your email is already use'})
     if serialized.is_valid():
-        User_model.object.create(name=serialized.data['name'],
+        create_user = User_model.object.create(name=serialized.data['name'],
                                  email=serialized.data['email'],
                                  username=serialized.data['username'],
                                  password=make_password(serialized.data['password']),
+                                 is_active=False,
                                  is_creator=serialized.data['is_creator'], image=request.data["image"])
+        current_site = get_current_site(request)
+        mail_subject = 'Confirm your email address'
+        message = render_to_string('email_template.html', {
+            'user': create_user,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(create_user.pk)),
+            'token': account_activation_token.make_token(create_user),
+        })
+        try:
+            send_mail(mail_subject, message, 'Masjid App<masjidapp@aniyanetworks.net>', [request.data['email']])
+        except:
+            print("not send")
+
+        print('password action')
         response = {}
         response['success'] = True
+        response['message'] = "Please check your email to verify your account.."
         response['data'] = serialized.data
         return Response(response, status=status.HTTP_201_CREATED)
     else:
@@ -111,6 +140,7 @@ class RemoveWithSalatToFavView(APIView):
             return Response({"success": False, "message": "Remove to Favorite Unsuccessful"},
                             status=status.HTTP_202_ACCEPTED)
 
+
 class RemoveMasjidView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -127,7 +157,6 @@ class RemoveMasjidView(APIView):
                             status=status.HTTP_200_OK)
         except:
             return Response({"success": False, "message": "Masjid Object Not found"})
-
 
 
 class RemoveWithFavToFavView(APIView):
@@ -257,6 +286,7 @@ class Search_Masjid_View(APIView):
         except:
             return Response({"success": False, "message": "Data get unsuccessful."})
 
+
 class update_masjid(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -312,6 +342,7 @@ class update_masjid(APIView):
         serializer_data = Salat_Times_Serializer(current_masjid, context={'request': request}, many=False)
         return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
                         status=status.HTTP_202_ACCEPTED)
+
 
 class Salat_Times(APIView):
     authentication_classes = [TokenAuthentication]
@@ -370,3 +401,18 @@ class Salat_Times(APIView):
         salatData = Salat_Time_List.objects.filter(user_id=user)
         serializer = Salat_Times_Serializer(salatData, context={'request': request}, many=True)
         return Response({"success": True, "data": serializer.data}, status=status.HTTP_202_ACCEPTED)
+
+
+def activate(request, uidb64, token):
+    User = get_user_model()
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.object.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        return render(request, 'conformation_design.html')
+    else:
+        return render(request, 'conformation_design.html')

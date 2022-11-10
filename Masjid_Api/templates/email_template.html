@@ -1,0 +1,8 @@
+
+{% autoescape off %}
+Hi there,
+
+Please click the link below to confirm your registration:
+
+https://masjidappword.herokuapp.com{% url 'Api_View:activate' uidb64=uid token=token %}
+{% endautoescape %}

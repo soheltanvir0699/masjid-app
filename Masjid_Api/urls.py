@@ -20,6 +20,7 @@ urlpatterns = [
     path(r'api/update-masjid/', views.update_masjid.as_view(), name='update_masjid'),
     path(r'api/remove-fav-salat/', views.RemoveWithSalatToFavView.as_view(), name='removeFavSalatid'),
     path(r'api/remove-masjid/', views.RemoveMasjidView.as_view(), name='removeMasjid'),
+    path('activate/<uidb64>/<token>', views.activate, name='activate'),
     path(r'api/remove-fav-fav/', views.RemoveWithFavToFavView.as_view(), name='removeFavFav'),
 
 ]
