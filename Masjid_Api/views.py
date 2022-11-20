@@ -1,11 +1,10 @@
-from django.contrib import auth
-from django.core.mail import send_mail
-from django.db.models import Sum, Avg, Max, Min
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.http import HttpResponse, JsonResponse, response
 from urllib.parse import urlparse, parse_qs
 from django.db.models import Q
 from django.shortcuts import render
 from datetime import datetime
+from django.contrib import messages, auth
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
@@ -15,6 +14,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from .tokens import account_activation_token
 from django.core.mail import send_mail
 from rest_framework import status
+from django.urls import reverse
+from django.core.mail import EmailMessage
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
@@ -40,7 +41,7 @@ class LoginView(APIView):
             invalidate_token = Token.objects.filter(user=user)
             print(invalidate_token)
             invalidate_token.delete()
-            if not user.is_active:
+            if user.is_active == False:
                 return JsonResponse({"success": False, "message": 'Please check your email to verify your account..'})
         except:
             print('token not found')
@@ -73,11 +74,11 @@ def create_auth(request):
         return JsonResponse({"success": False, "message": 'your email is already use'})
     if serialized.is_valid():
         create_user = User_model.object.create(name=serialized.data['name'],
-                                 email=serialized.data['email'],
-                                 username=serialized.data['username'],
-                                 password=make_password(serialized.data['password']),
-                                 is_active=False,
-                                 is_creator=serialized.data['is_creator'], image=request.data["image"])
+                                               email=serialized.data['email'],
+                                               username=serialized.data['username'],
+                                               password=make_password(serialized.data['password']),
+                                               is_active=False,
+                                               is_creator=serialized.data['is_creator'], image=request.data["image"])
         current_site = get_current_site(request)
         mail_subject = 'Confirm your email address'
         message = render_to_string('email_template.html', {
@@ -100,7 +101,89 @@ def create_auth(request):
     else:
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class requestpasswordresetemail(APIView):
+    def get(self, request):
+        return JsonResponse({"success": True})
 
+    def post(self, request):
+        email = request.data['email'].lower()
+        print(email)
+        # context = {
+        #     'values': request.POST
+        # }
+
+        # if not validate_email(email):
+
+        current_site = get_current_site(request)
+        try:
+            User = User_model.object.filter(email=email)
+            if len(User) == 0:
+                return JsonResponse({"success": False, "message": "Email not Valid."})
+        except:
+            return JsonResponse({"success": False, "message": "Email not Valid."})
+        if User.exists():
+            messages.success(request, 'We send an email')
+            email_contents = {
+                'user': User[0],
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(User[0].pk)),
+                'token': PasswordResetTokenGenerator().make_token(User[0]),
+            }
+
+            link = reverse('Api_View:compleat', kwargs={
+                'uidb64': email_contents['uid'], 'token': email_contents['token']})
+
+            email_subject = 'Reset your password'
+
+            rest_url = 'https://masjidappword.herokuapp.com' + link
+
+            email2 = EmailMessage(
+                email_subject,
+                'Hi there, Please use the link below to reset your password \n' + rest_url, "Masjid App<masjidapp@aniyanetworks.net>"
+                ,
+                [email],
+            )
+            try:
+                ese = email2.send(fail_silently=True)
+                messages.success(request, 'please check your email')
+            except:
+                messages.error(request, 'pleased enter a valid email')
+
+        return JsonResponse({"success": True, "message": "Password reset email sent."})
+
+def completepassword(request, uidb64, token):
+    if request.method == "GET":
+        context = {
+            'uidb64': uidb64,
+            'token': token
+        }
+        print(context)
+        return render(request, 'set-rest-password.html', context)
+    else:
+        is_success = 0
+        trashOldMsg(request)
+        context = {'uidb64': uidb64, 'token': token, 'is_success': 0}
+        password = request.POST['password']
+        password2 = request.POST['password2']
+        print(context, password2, password)
+        if password != password2:
+            trashOldMsg(request)
+            messages.error(request, 'Passwords do not match')
+            return render(request, 'set-rest-password.html', context)
+        if len(password) < 6:
+            trashOldMsg(request)
+            messages.error(request, 'Password is too short')
+            return render(request, 'set-rest-password.html', context)
+        user_id = force_str(urlsafe_base64_decode(uidb64))
+        print(user_id)
+        user = User_model.object.get(pk=user_id)
+        print(user)
+        user.password = make_password(password)
+        user.save()
+        is_success = 1
+        context['is_success'] = is_success
+        messages.success(request, 'Password reset successful.')
+        return render(request, 'success_temp.html', context)
 class LogoutView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -158,6 +241,13 @@ class RemoveMasjidView(APIView):
         except:
             return Response({"success": False, "message": "Masjid Object Not found"})
 
+def trashOldMsg(req):
+    storage = messages.get_messages(req)
+    storage.user = True
+    for _ in storage:
+        pass
+    for _ in list(storage._loaded_messages):
+        del storage._loaded_messages[0]
 
 class RemoveWithFavToFavView(APIView):
     authentication_classes = [TokenAuthentication]
