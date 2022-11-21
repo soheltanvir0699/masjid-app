@@ -1,5 +1,7 @@
 # Create your models here.
 from django.db import models
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis import geos
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 # Create your models here.
@@ -42,11 +44,13 @@ class User_model(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    location = gis_models.PointField(u"longitude/latitude",
+                                     geography=True, blank=True, null=True)
     image = models.ImageField(upload_to='image/user_pic/%y/%m/%d', null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', ]
-
+    gis = gis_models.GeoManager()
     object = MyAccountManager()
 
     def delete(self, *args, **kwargs):
