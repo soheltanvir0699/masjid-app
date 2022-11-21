@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'Masjid_Api',
     'rest_framework',
     'rest_framework.authtoken',
+'django.contrib.gis',
 'cloudinary_storage',
     'cloudinary',
 ]
