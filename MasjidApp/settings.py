@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 from django.conf.global_settings import DATETIME_INPUT_FORMATS
 # for server
-# import django_heroku
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,8 +44,9 @@ INSTALLED_APPS = [
     'Masjid_Api',
     'rest_framework',
     'rest_framework.authtoken',
-# 'cloudinary_storage',
-#     'cloudinary',
+    'django.contrib.gis'
+'cloudinary_storage',
+    'cloudinary',
 ]
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dcfwwuqqt',
@@ -58,7 +59,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-# 'whitenoise.middleware.WhiteNoiseMiddleware',
+'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -104,7 +105,8 @@ REST_FRAMEWORK = {
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-
+GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
+GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -172,4 +174,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# django_heroku.settings(locals())
+django_heroku.settings(locals())
