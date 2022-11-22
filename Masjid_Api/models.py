@@ -1,9 +1,8 @@
 # Create your models here.
 from django.db import models
-from django.contrib.gis.db import models as gis_models
-from django.contrib.gis import geos
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-
+from django.contrib.gis.db.models import PointField
+from django.contrib.gis.geos import Point
 # Create your models here.
 from MasjidApp import settings
 
@@ -44,13 +43,11 @@ class User_model(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    location = gis_models.PointField(u"longitude/latitude",
-                                     geography=True, blank=True, null=True)
     image = models.ImageField(upload_to='image/user_pic/%y/%m/%d', null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', ]
-    gis = gis_models.GeoManager()
+
     object = MyAccountManager()
 
     def delete(self, *args, **kwargs):
@@ -94,7 +91,11 @@ class Salat_Time_List(models.Model):
     Imsak = models.TimeField(auto_created=False, blank=True, null=True)
     create_at = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     update_at = models.DateTimeField(verbose_name='last updated', auto_now=True, null=True)
-
+    latitude = models.DecimalField(max_digits=15, decimal_places=10)
+    longitude = models.DecimalField(max_digits=15, decimal_places=10)
+    city = models.CharField(max_length=100, null=True)
+    state = models.CharField(max_length=100, null=True)
+    location = PointField(blank=True, null=True, srid=4326)
     def __str__(self):
         return self.mosque_name
 
@@ -105,6 +106,13 @@ class Salat_Time_List(models.Model):
                 this.image.delete()
         except:
             pass
+
+        try:
+            self.location = Point(self.longitude, self.latitude)
+            super(Salat_Time_List, self).save(*args, **kwargs)
+        except Exception as e:
+            pass
+
         super(Salat_Time_List, self).save(*args, **kwargs)
 
 

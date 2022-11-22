@@ -1,10 +1,11 @@
 import json
 import urllib
-
+from geopy import distance
 import requests
 from django.shortcuts import render
 from ipware import get_client_ip
 from datetime import datetime
+from .models import Salat_Time_List
 
 
 def about(request):
@@ -38,9 +39,25 @@ def gallery(request):
     if request.method == 'GET':
        return render(request, 'gallery.html',{})
 
+def get_distance(user_co, friend_co):
+    coords_1 = (user_co.get('lat'), user_co.get('long'))
+    coords_2 = (float(friend_co.get('lat')), float(friend_co.get('long')))
+
+    return distance.distance(coords_1, coords_2).km
 
 def index(request):
+
     if request.method == 'GET':
+
+        user = {'lat': 25.276987, 'long': 55.296249}
+        friends = {'user2': {'lat': '25.122212', 'long': '55.296249'},
+                   'user3': {'lat': '25.222212', 'long': '55.396249'}}
+
+        for key, value in friends.items():
+            dstnce = get_distance(user, value)
+            print(value,dstnce)
+            if dstnce < 50:
+                print("Friend {} is in 50 KM".format(key))
         client_ip, is_routable = get_client_ip(request)
 
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -64,3 +81,25 @@ def index(request):
         print(current_day, current_month_text)
         return render(request, 'index.html',
                       {"salatTime": salatTime, "current_day": current_day, "current_month": current_month_text})
+
+def nearby_spots_old(request, lat, lng, radius=5000, limit=50):
+    """
+    WITHOUT use of any external library, using raw MySQL and Haversine Formula
+    http://en.wikipedia.org/wiki/Haversine_formula
+    """
+    radius = float(radius) / 1000.0
+
+    query = """SELECT id, (6367*acos(cos(radians(%2f))
+               *cos(radians(latitude))*cos(radians(longitude)-radians(%2f))
+               +sin(radians(%2f))*sin(radians(latitude))))
+               AS distance FROM demo_spot HAVING
+               distance < %2f ORDER BY distance LIMIT 0, %d""" % (
+        float(lat),
+        float(lng),
+        float(lat),
+        radius,
+        limit
+    )
+
+    # queryset = Spot.objects.raw(query)
+    # print(queryset)
