@@ -355,21 +355,23 @@ class All_Masjid_View(APIView):
         except:
             country = ""
 
-
         try:
-            if state != "":
-                masjid_by_state = Salat_Time_List.objects.filter(state=state)
-            else:
-                masjid_by_state = None
-            if city != "":
-                masjid_by_city = Salat_Time_List.objects.filter(city=city).filter(~Q(state=state))
-            else:
-                masjid_by_city = None
-            if country != "":
-                masjid_by_country = Salat_Time_List.objects.filter(country=country).filter(~Q(state=state)).filter(
-                    ~Q(city=city))
-            else:
-                masjid_by_country = None
+            masjid_by_state = Salat_Time_List.objects.filter(state=state)
+            masjid_by_city = Salat_Time_List.objects.filter(city=city).filter(~Q(state=state))
+            masjid_by_country = Salat_Time_List.objects.filter(country=country).filter(~Q(state=state)).filter(
+                ~Q(city=city))
+            # if state != "":
+            #
+            # else:
+            #     masjid_by_state = None
+            # if city != "":
+            #
+            # else:
+            #     masjid_by_city = None
+            # if country != "":
+            #
+            # else:
+            #     masjid_by_country = None
             masjid = Salat_Time_List.objects.filter(~Q(country=country)).filter(~Q(city=city)).filter(~Q(state=state))
             print(masjid)
             print(masjid_by_city)
@@ -379,7 +381,6 @@ class All_Masjid_View(APIView):
             print(combined_results)
             serializer = Salat_Times_Serializer(combined_results, context={'request': request, 'email': email},
                                                 many=True)
-
             return Response({"success": True, "message": "Data get successful.", "data": serializer.data},
                             status=status.HTTP_202_ACCEPTED)
         # Token shfajshaifsiue548747382dfsihfs87e8wfshfw8e7wisfhicsh8r8r7.split(" ")
