@@ -25,7 +25,6 @@ djangorestframework==3.13.1
 fcm-django==1.0.8
 grpcio==1.49.0
 gunicorn==19.10.0
-GDAL==2.1
 heroku==0.1.4
 inapppy==2.5.2
 lxml==4.6.3
