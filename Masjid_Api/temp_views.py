@@ -1,6 +1,6 @@
 import json
 import urllib
-from geopy import distance
+# from geopy import distance
 import requests
 from django.shortcuts import render
 from ipware import get_client_ip
@@ -49,15 +49,15 @@ def index(request):
 
     if request.method == 'GET':
 
-        user = {'lat': 25.276987, 'long': 55.296249}
-        friends = {'user2': {'lat': '25.122212', 'long': '55.296249'},
-                   'user3': {'lat': '25.222212', 'long': '55.396249'}}
-
-        for key, value in friends.items():
-            dstnce = get_distance(user, value)
-            print(value,dstnce)
-            if dstnce < 50:
-                print("Friend {} is in 50 KM".format(key))
+        # user = {'lat': 25.276987, 'long': 55.296249}
+        # friends = {'user2': {'lat': '25.122212', 'long': '55.296249'},
+        #            'user3': {'lat': '25.222212', 'long': '55.396249'}}
+        #
+        # for key, value in friends.items():
+        #     dstnce = get_distance(user, value)
+        #     print(value,dstnce)
+        #     if dstnce < 50:
+        #         print("Friend {} is in 50 KM".format(key))
         client_ip, is_routable = get_client_ip(request)
 
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
