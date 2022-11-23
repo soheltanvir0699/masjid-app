@@ -343,17 +343,19 @@ class All_Masjid_View(APIView):
         except:
             email = ""
         try:
-            state = request.data['state']
+            state = request.data['state'].upper()
         except:
             state = ""
         try:
-            city = request.data['city']
+            city = request.data['city'].upper()
         except:
             city = ""
         try:
-            country = request.data['country']
+            country = request.data['country'].upper()
         except:
             country = ""
+
+
         try:
             if state != "":
                 masjid_by_state = Salat_Time_List.objects.filter(state=state)
@@ -368,10 +370,16 @@ class All_Masjid_View(APIView):
                     ~Q(city=city))
             else:
                 masjid_by_country = None
-            masjid = Salat_Time_List.objects.filter(~Q(country=country))
-            combined_results = list(chain(masjid_by_state, masjid_by_city, masjid_by_country))
-            serializer = Salat_Times_Serializer(combined_results, context={'request': request, 'email': email}, many=True)
+            masjid = Salat_Time_List.objects.filter(~Q(country=country)).filter(~Q(city=city)).filter(~Q(state=state))
             print(masjid)
+            print(masjid_by_city)
+            print(masjid_by_country)
+            print(masjid_by_state)
+            combined_results = masjid_by_state | masjid_by_city | masjid_by_country | masjid
+            print(combined_results)
+            serializer = Salat_Times_Serializer(combined_results, context={'request': request, 'email': email},
+                                                many=True)
+
             return Response({"success": True, "message": "Data get successful.", "data": serializer.data},
                             status=status.HTTP_202_ACCEPTED)
         # Token shfajshaifsiue548747382dfsihfs87e8wfshfw8e7wisfhicsh8r8r7.split(" ")
@@ -445,15 +453,15 @@ class update_masjid(APIView):
             mosque_icon = None
 
         try:
-            state = request.data['state']
+            state = request.data['state'].upper()
         except:
             return Response({"success": False, "message": "State name is empty."}, status=status.HTTP_202_ACCEPTED)
         try:
-            city = request.data['city']
+            city = request.data['city'].upper()
         except:
             return Response({"success": False, "message": "City name is empty."}, status=status.HTTP_202_ACCEPTED)
         try:
-            country = request.data['country']
+            country = request.data['country'].upper()
         except:
             return Response({"success": False, "message": "Country name is empty."}, status=status.HTTP_202_ACCEPTED)
         try:
