@@ -1,8 +1,6 @@
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.contrib.gis.db.models import PointField
-from django.contrib.gis.geos import Point
 # Create your models here.
 from MasjidApp import settings
 
@@ -91,11 +89,10 @@ class Salat_Time_List(models.Model):
     Imsak = models.TimeField(auto_created=False, blank=True, null=True)
     create_at = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     update_at = models.DateTimeField(verbose_name='last updated', auto_now=True, null=True)
-    latitude = models.DecimalField(max_digits=15, decimal_places=10)
-    longitude = models.DecimalField(max_digits=15, decimal_places=10)
     city = models.CharField(max_length=100, null=True)
     state = models.CharField(max_length=100, null=True)
-    location = PointField(blank=True, null=True, srid=4326)
+    country = models.CharField(max_length=100, null=True)
+
     def __str__(self):
         return self.mosque_name
 
@@ -107,18 +104,18 @@ class Salat_Time_List(models.Model):
         except:
             pass
 
-        try:
-            self.location = Point(self.longitude, self.latitude)
-            super(Salat_Time_List, self).save(*args, **kwargs)
-        except Exception as e:
-            pass
+        # try:
+        #     self.location = Point(self.longitude, self.latitude)
+        #     super(Salat_Time_List, self).save(*args, **kwargs)
+        # except Exception as e:
+        #     pass
 
         super(Salat_Time_List, self).save(*args, **kwargs)
 
 
 class Favorite_Time_List(models.Model):
     salat_Id = models.ForeignKey(Salat_Time_List, on_delete=models.CASCADE,
-                                related_name="Salat_id")
+                                 related_name="Salat_id")
     user_id = models.ForeignKey(User_model, on_delete=models.CASCADE,
                                 related_name="user_id")
     is_default = models.BooleanField(default=False)

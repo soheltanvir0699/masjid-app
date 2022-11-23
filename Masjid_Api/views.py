@@ -1,6 +1,7 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.http import HttpResponse, JsonResponse, response
 from urllib.parse import urlparse, parse_qs
+from itertools import chain
 from django.db.models import Q
 from django.shortcuts import render
 from datetime import datetime
@@ -342,8 +343,34 @@ class All_Masjid_View(APIView):
         except:
             email = ""
         try:
-            masjid = Salat_Time_List.objects.all()
-            serializer = Salat_Times_Serializer(masjid, context={'request': request, 'email': email}, many=True)
+            state = request.data['state']
+        except:
+            state = ""
+        try:
+            city = request.data['city']
+        except:
+            city = ""
+        try:
+            country = request.data['country']
+        except:
+            country = ""
+        try:
+            if state != "":
+                masjid_by_state = Salat_Time_List.objects.filter(state=state)
+            else:
+                masjid_by_state = None
+            if city != "":
+                masjid_by_city = Salat_Time_List.objects.filter(city=city).filter(~Q(state=state))
+            else:
+                masjid_by_city = None
+            if country != "":
+                masjid_by_country = Salat_Time_List.objects.filter(country=country).filter(~Q(state=state)).filter(
+                    ~Q(city=city))
+            else:
+                masjid_by_country = None
+            masjid = Salat_Time_List.objects.filter(~Q(country=country))
+            combined_results = list(chain(masjid_by_state, masjid_by_city, masjid_by_country))
+            serializer = Salat_Times_Serializer(combined_results, context={'request': request, 'email': email}, many=True)
             print(masjid)
             return Response({"success": True, "message": "Data get successful.", "data": serializer.data},
                             status=status.HTTP_202_ACCEPTED)
@@ -418,9 +445,22 @@ class update_masjid(APIView):
             mosque_icon = None
 
         try:
+            state = request.data['state']
+        except:
+            return Response({"success": False, "message": "State name is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            city = request.data['city']
+        except:
+            return Response({"success": False, "message": "City name is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            country = request.data['country']
+        except:
+            return Response({"success": False, "message": "Country name is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
             current_masjid = Salat_Time_List.objects.get(id=id)
         except:
             return Response({"success": False, "message": "Masjid Not Found."}, status=status.HTTP_202_ACCEPTED)
+
         current_masjid.mosque_name = mosque_name
         current_masjid.mosque_icon = mosque_icon
         current_masjid.Fajr = fajr_date
@@ -428,6 +468,9 @@ class update_masjid(APIView):
         current_masjid.Asr = asr_date
         current_masjid.Maghrib = maghrib_date
         current_masjid.Isha = isha_date
+        current_masjid.state = state
+        current_masjid.city = city
+        current_masjid.country = country
         current_masjid.save()
         serializer_data = Salat_Times_Serializer(current_masjid, context={'request': request}, many=False)
         return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
@@ -477,16 +520,29 @@ class Salat_Times(APIView):
             mosque_icon = request.data['mosque_icon']
         except:
             mosque_icon = None
+        try:
+            state = request.data['state']
+        except:
+            return Response({"success": False, "message": "State name is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            city = request.data['city']
+        except:
+            return Response({"success": False, "message": "City name is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            country = request.data['country']
+        except:
+            return Response({"success": False, "message": "Country name is empty."}, status=status.HTTP_202_ACCEPTED)
 
         time_sa = Salat_Time_List.objects.create(mosque_name=mosque_name, mosque_icon=mosque_icon, user_id=user,
                                                  Fajr=fajr_date, Sunrise=Sunrise, Dhuhr=dhuhr_date, Asr=asr_date,
-                                                 Sunset=Sunset, Maghrib=maghrib_date, Isha=isha_date)
+                                                 Sunset=Sunset, Maghrib=maghrib_date, Isha=isha_date,state=state, city=city,country=country)
         time_sa.save()
         serializer_data = Salat_Times_Serializer(time_sa, context={'request': request}, many=False)
         return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
                         status=status.HTTP_202_ACCEPTED)
 
     def get(self, request, **kwargs):
+
         user = User_model.object.get(id=request.user.id)
         salatData = Salat_Time_List.objects.filter(user_id=user)
         serializer = Salat_Times_Serializer(salatData, context={'request': request}, many=True)

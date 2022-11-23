@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'Masjid_Api',
     'rest_framework',
     'rest_framework.authtoken',
-    'django.contrib.gis'
+    # 'django.contrib.gis'
 'cloudinary_storage',
     'cloudinary',
 ]
@@ -99,24 +99,24 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
-GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'dbisegok5cd6c0',
-        'USER': 'hybjjxnnbrlmrx',
-        'PASSWORD': '4f137f64ba132e9bc356f024613d0b50e7395d8ca07a6e803f6e3ae499327b01',
-        'HOST': 'ec2-52-1-17-228.compute-1.amazonaws.com',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
+# GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'NAME': 'dbisegok5cd6c0',
+#         'USER': 'hybjjxnnbrlmrx',
+#         'PASSWORD': '4f137f64ba132e9bc356f024613d0b50e7395d8ca07a6e803f6e3ae499327b01',
+#         'HOST': 'ec2-52-1-17-228.compute-1.amazonaws.com',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
