@@ -15,7 +15,7 @@ import os
 from django.conf.global_settings import DATETIME_INPUT_FORMATS
 
 # for server
-# import django_heroku
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,8 +45,8 @@ INSTALLED_APPS = [
     'import_export',
     'rest_framework.authtoken',
     # 'django.contrib.gis'
-    # 'cloudinary_storage',
-    #     'cloudinary',
+    'cloudinary_storage',
+        'cloudinary',
 ]
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dcfwwuqqt',
@@ -59,12 +59,12 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 ROOT_URLCONF = 'MasjidApp.urls'
 
 TEMPLATES = [
@@ -93,7 +93,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 15
+    'PAGE_SIZE': 25
 }
 
 # Database
@@ -173,4 +173,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# django_heroku.settings(locals())
+django_heroku.settings(locals())
