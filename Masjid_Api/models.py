@@ -47,6 +47,7 @@ class User_model(AbstractBaseUser):
     REQUIRED_FIELDS = ['username', ]
 
     object = MyAccountManager()
+    objects = MyAccountManager()
 
     def delete(self, *args, **kwargs):
         # first, delete the file
@@ -92,6 +93,7 @@ class Salat_Time_List(models.Model):
     city = models.CharField(max_length=100, null=True)
     state = models.CharField(max_length=100, null=True)
     country = models.CharField(max_length=100, null=True)
+    address = models.CharField(max_length=250, null=True, blank=True)
 
     def __str__(self):
         return self.mosque_name
@@ -101,6 +103,11 @@ class Salat_Time_List(models.Model):
             this = Salat_Time_List.objects.get(id=self.id)
             if this.image != self.mosque_icon:
                 this.image.delete()
+        except:
+            pass
+
+        try:
+            self.address = self.state+", "+self.city+", "+self.country
         except:
             pass
 

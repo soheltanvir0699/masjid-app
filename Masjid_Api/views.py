@@ -373,15 +373,13 @@ class All_Masjid_View(APIView):
             # else:
             #     masjid_by_country = None
             masjid = Salat_Time_List.objects.filter(~Q(country=country)).filter(~Q(city=city)).filter(~Q(state=state))
-            print(masjid)
-            print(masjid_by_city)
-            print(masjid_by_country)
-            print(masjid_by_state)
             combined_results = masjid_by_state | masjid_by_city | masjid_by_country | masjid
-            print(combined_results)
-            serializer = Salat_Times_Serializer(combined_results, context={'request': request, 'email': email},
+            paginator = PageNumberPagination()
+            paginator.page_size = 15
+            result_page = paginator.paginate_queryset(combined_results, request)
+            serializer = Salat_Times_Serializer(result_page, context={'request': request, 'email': email},
                                                 many=True)
-            return Response({"success": True, "message": "Data get successful.", "data": serializer.data},
+            return Response({"success": True, "message": "Data get successful.", "data": paginator.get_paginated_response(serializer.data).data},
                             status=status.HTTP_202_ACCEPTED)
         # Token shfajshaifsiue548747382dfsihfs87e8wfshfw8e7wisfhicsh8r8r7.split(" ")
 
@@ -402,10 +400,13 @@ class Search_Masjid_View(APIView):
         try:
             keyword = request.GET.get('keyword', '!!!!')
             print(keyword)
-            masjid = Salat_Time_List.objects.filter(Q(mosque_name__icontains=keyword))
+            masjid = Salat_Time_List.objects.filter(Q(mosque_name__icontains=keyword)) | Salat_Time_List.objects.filter(Q(address__icontains=keyword))
+            paginator = PageNumberPagination()
+            paginator.page_size = 15
+            result_page = paginator.paginate_queryset(masjid, request)
             serializer = Salat_Times_Serializer(masjid, context={'request': request, 'email': email}, many=True)
             print(masjid)
-            return Response({"success": True, "message": "Data get successful.", "data": serializer.data},
+            return Response({"success": True, "message": "Data get successful.", "data": paginator.get_paginated_response(serializer.data).data},
                             status=status.HTTP_202_ACCEPTED)
         # Token shfajshaifsiue548747382dfsihfs87e8wfshfw8e7wisfhicsh8r8r7.split(" ")
 
