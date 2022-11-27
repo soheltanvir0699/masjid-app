@@ -543,6 +543,9 @@ class Salat_Times(APIView):
         except:
             return Response({"success": False, "message": "Country name is empty."}, status=status.HTTP_202_ACCEPTED)
 
+        salatList = Salat_Time_List.objects.filter(user_id=user)
+        if len(salatList) != 0:
+            return Response({"success": False, "message": "Can't create more than one Masjid"}, status=status.HTTP_202_ACCEPTED)
         time_sa = Salat_Time_List.objects.create(mosque_name=mosque_name, mosque_icon=mosque_icon, user_id=user,
                                                  Fajr=fajr_date, Sunrise=Sunrise, Dhuhr=dhuhr_date, Asr=asr_date,
                                                  Sunset=Sunset, Maghrib=maghrib_date, Isha=isha_date,state=state, city=city,country=country)
