@@ -375,7 +375,7 @@ class All_Masjid_View(APIView):
             masjid = Salat_Time_List.objects.filter(~Q(country=country)).filter(~Q(city=city)).filter(~Q(state=state))
             combined_results = masjid_by_state | masjid_by_city | masjid_by_country | masjid
             paginator = PageNumberPagination()
-            paginator.page_size = 15
+            paginator.page_size = 2
             result_page = paginator.paginate_queryset(combined_results, request)
             serializer = Salat_Times_Serializer(result_page, context={'request': request, 'email': email},
                                                 many=True)
