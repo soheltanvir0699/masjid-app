@@ -54,6 +54,13 @@ class LoginView(APIView):
             try:
                 # auth.authenticate(username=serializer.data['username'], password=serializer.data['password'])
                 user = User_model.object.get(email=serializer.data['username'])
+
+                try:
+                    user.onesignal_id = request.data['user_id']
+                    user.save()
+                except:
+                    print()
+
                 token = Token.objects.create(user=user)
                 response = {}
                 response['success'] = True
