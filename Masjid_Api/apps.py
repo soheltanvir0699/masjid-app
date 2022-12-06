@@ -8,4 +8,7 @@ class MasjidApiConfig(AppConfig):
     def ready(self):
         from .jobs import updater
         updater.start()
+        # if (os.environ.get("DYNO")):
+        #     updater.start()
+
 
