@@ -509,8 +509,8 @@ class Salat_Times(APIView):
         else:
             ip = request.META.get('REMOTE_ADDR')
 
-        # url = f'https://api.ipfind.com/?ip={client_ip}'
-        url = f'https://api.ipfind.com/?ip=116.204.228.142'
+        url = f'https://api.ipfind.com/?ip={client_ip}'
+        # url = f'https://api.ipfind.com/?ip=116.204.228.142'
         r = requests.get(url)
 
         user = User_model.object.get(id=request.user.id)

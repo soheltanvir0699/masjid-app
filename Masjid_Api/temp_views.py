@@ -66,12 +66,10 @@ def index(request):
         else:
             ip = request.META.get('REMOTE_ADDR')
 
-        # url = f'https://api.ipfind.com/?ip={client_ip}'
-        url = f'https://api.ipfind.com/?ip=116.204.228.142'
+        url = f'https://api.ipfind.com/?ip={client_ip}'
         r = requests.get(url)
         r_status = r.status_code
         # print(r.json()["country"])
-        #timezone
         city = r.json()["city"]
         country = r.json()["country"]
         url2 = "http://api.aladhan.com/v1/timingsByCity?city=" + f"{city}" + "&country=" + f"{country}" + "&method=2"
