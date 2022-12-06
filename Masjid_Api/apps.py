@@ -7,6 +7,5 @@ class MasjidApiConfig(AppConfig):
 
     def ready(self):
         from .jobs import updater
-        if os.environ.get('RUN_MAIN'):
-            updater.start()
+        updater.start()
 
