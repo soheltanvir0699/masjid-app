@@ -26,9 +26,10 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
-from .models import User_model, Salat_Time_List, Favorite_Time_List
+from .models import User_model, Salat_Time_List, Favorite_Time_List, Country_List
 from .serializers import LoginSerializer, SingleUserSerializer, UserSerializer, Salat_Times_Serializer, Fav_Serializer
-
+import requests
+from ipware import get_client_ip
 
 # Create your views here.
 
@@ -500,6 +501,18 @@ class Salat_Times(APIView):
 
     def post(self, request, **kwargs):
         print(request.user.id)
+        client_ip, is_routable = get_client_ip(request)
+
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+
+        # url = f'https://api.ipfind.com/?ip={client_ip}'
+        url = f'https://api.ipfind.com/?ip=116.204.228.142'
+        r = requests.get(url)
+
         user = User_model.object.get(id=request.user.id)
         try:
             fajr_date = request.data['Fajr']
@@ -550,12 +563,21 @@ class Salat_Times(APIView):
         except:
             return Response({"success": False, "message": "Country name is empty."}, status=status.HTTP_202_ACCEPTED)
 
+        try:
+            # timezone
+            timezone = r.json()["timezone"]
+            print(timezone)
+            country_list = Country_List.objects.create(country_name=country.lower(), time_zone=timezone)
+            country_list.save()
+        except:
+            print("")
+
         salatList = Salat_Time_List.objects.filter(user_id=user)
         if len(salatList) != 0:
             return Response({"success": False, "message": "Can't create more than one Masjid"}, status=status.HTTP_202_ACCEPTED)
         time_sa = Salat_Time_List.objects.create(mosque_name=mosque_name, mosque_icon=mosque_icon, user_id=user,
                                                  Fajr=fajr_date, Sunrise=Sunrise, Dhuhr=dhuhr_date, Asr=asr_date,
-                                                 Sunset=Sunset, Maghrib=maghrib_date, Isha=isha_date,state=state, city=city,country=country)
+                                                 Sunset=Sunset, Maghrib=maghrib_date, Isha=isha_date,state=state, city=city,country=country.lower())
         time_sa.save()
         serializer_data = Salat_Times_Serializer(time_sa, context={'request': request}, many=False)
         return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},

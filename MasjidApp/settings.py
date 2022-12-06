@@ -45,8 +45,8 @@ INSTALLED_APPS = [
     'import_export',
     'rest_framework.authtoken',
     # 'django.contrib.gis'
-    'cloudinary_storage',
-        'cloudinary',
+    # 'cloudinary_storage',
+    #     'cloudinary',
 ]
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dcfwwuqqt',
@@ -64,7 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 ROOT_URLCONF = 'MasjidApp.urls'
 
 TEMPLATES = [

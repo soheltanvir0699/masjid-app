@@ -25,3 +25,7 @@ class EmployeeAdmin(ImportExportModelAdmin):
 @admin.register(models.Favorite_Time_List)
 class EmployeeAdmin(ImportExportModelAdmin):
     pass
+
+@admin.register(models.Country_List)
+class EmployeeAdmin(ImportExportModelAdmin):
+    pass

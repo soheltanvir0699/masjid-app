@@ -76,6 +76,14 @@ class User_model(AbstractBaseUser):
         return self.is_superuser
 
 
+class Country_List(models.Model):
+    country_name = models.CharField(max_length=100, unique=True, null=True)
+    time_zone = models.CharField(max_length=100, unique=True, null=True)
+
+    def __str__(self):
+        return self.country_name
+
+
 class Salat_Time_List(models.Model):
     mosque_name = models.CharField(max_length=200)
     mosque_icon = models.ImageField(null=True)
@@ -108,7 +116,7 @@ class Salat_Time_List(models.Model):
             pass
 
         try:
-            self.address = self.state+", "+self.city+", "+self.country
+            self.address = self.state + ", " + self.city + ", " + self.country
         except:
             pass
 

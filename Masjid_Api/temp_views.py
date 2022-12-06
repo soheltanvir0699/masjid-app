@@ -39,11 +39,11 @@ def gallery(request):
     if request.method == 'GET':
        return render(request, 'gallery.html',{})
 
-def get_distance(user_co, friend_co):
-    coords_1 = (user_co.get('lat'), user_co.get('long'))
-    coords_2 = (float(friend_co.get('lat')), float(friend_co.get('long')))
-
-    return distance.distance(coords_1, coords_2).km
+# def get_distance(user_co, friend_co):
+#     coords_1 = (user_co.get('lat'), user_co.get('long'))
+#     coords_2 = (float(friend_co.get('lat')), float(friend_co.get('long')))
+#
+#     return distance.distance(coords_1, coords_2).km
 
 def index(request):
 
@@ -66,10 +66,12 @@ def index(request):
         else:
             ip = request.META.get('REMOTE_ADDR')
 
-        url = f'https://api.ipfind.com/?ip={client_ip}'
+        # url = f'https://api.ipfind.com/?ip={client_ip}'
+        url = f'https://api.ipfind.com/?ip=116.204.228.142'
         r = requests.get(url)
         r_status = r.status_code
         # print(r.json()["country"])
+        #timezone
         city = r.json()["city"]
         country = r.json()["country"]
         url2 = "http://api.aladhan.com/v1/timingsByCity?city=" + f"{city}" + "&country=" + f"{country}" + "&method=2"
