@@ -45,26 +45,26 @@ INSTALLED_APPS = [
     'import_export',
     'rest_framework.authtoken',
     # 'django.contrib.gis'
-    # 'cloudinary_storage',
-    #     'cloudinary',
+    'cloudinary_storage',
+        'cloudinary',
 ]
-# CLOUDINARY_STORAGE = {
-#     'CLOUD_NAME': 'dcfwwuqqt',
-#     'API_KEY': '554599143982113',
-#     'API_SECRET': 'aHCcw3z4hUmopyST8ygOsni3rwY'
-# }
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'hiqpdd1kx',
+    'API_KEY': '256524275114637',
+    'API_SECRET': '0hIeVmzGlnvQJ6x2xeX2-PDyYjE'
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 ROOT_URLCONF = 'MasjidApp.urls'
 
 TEMPLATES = [
