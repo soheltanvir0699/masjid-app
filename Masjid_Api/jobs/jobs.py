@@ -7,6 +7,7 @@ from Masjid_Api import models
 
 
 def schedule_api():
+    print("working")
     all_country = models.Country_List.objects.all()
     playerID = []
     AsrplayerID = []
