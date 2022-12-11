@@ -6,6 +6,26 @@ import requests
 from Masjid_Api import models
 
 
+def updateMasjid():
+    current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+    current_updated_date = models.update_Salat_Time_List.objects.filter(update_date=current_date)
+    if len(current_updated_date) != 0:
+        for data in current_updated_date:
+            current_user = models.User_model.objects.get(id=data.user_id.id)
+            salat_list_data = models.Salat_Time_List.objects.get(user_id=current_user)
+            try:
+                salat_list_data.Fajr = data.Fajr
+                salat_list_data.Isha = data.Isha
+                salat_list_data.Maghrib = data.Maghrib
+                salat_list_data.Asr = data.Asr
+                salat_list_data.Dhuhr = data.Dhuhr
+                salat_list_data.save()
+                data.delete()
+            except:
+                print("")
+    print("")
+
+
 def schedule_api():
     print("working")
     all_country = models.Country_List.objects.all()
@@ -23,7 +43,8 @@ def schedule_api():
         now1 = datetime.datetime.now(ZoneInfo(country.time_zone)) - datetime.timedelta(minutes=1)
         current_time = now.strftime('%H:%M')
         current_time2 = now1.strftime('%H:%M')
-        all_fav_list1 = models.Favorite_Time_List.objects.filter(salat_Id__country=country).filter(salat_Id__Fajr=current_time)
+        all_fav_list1 = models.Favorite_Time_List.objects.filter(salat_Id__country=country).filter(
+            salat_Id__Fajr=current_time)
         all_fav_list2 = models.Favorite_Time_List.objects.filter(salat_Id__country=country).filter(
             salat_Id__Fajr=current_time2)
 
@@ -51,7 +72,7 @@ def schedule_api():
         current_time2 = now1.strftime('%H:%M') + ":00"
 
         for list in all_fav_list:
-            if list.salat_Id.Fajr == current_time or list.salat_Id.Fajr ==current_time2:
+            if list.salat_Id.Fajr == current_time or list.salat_Id.Fajr == current_time2:
                 if list.user_id.onesignal_id not in FajrplayerID:
                     if list.user_id.onesignal_id != "":
                         FajrplayerID.append(list.user_id.onesignal_id)
@@ -94,32 +115,33 @@ def schedule_api():
                    "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
                    "headings": {"en": "Fajr"}}
         payloadAsr = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
-                   "include_player_ids": AsrplayerID,
-                   "contents": {"en": "Salat Start",
-                                "ru": "Lorem ipsum dolor amit"},
-                   "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                   "headings": {"en": "Asr"}}
+                      "include_player_ids": AsrplayerID,
+                      "contents": {"en": "Salat Start",
+                                   "ru": "Lorem ipsum dolor amit"},
+                      "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+                      "headings": {"en": "Asr"}}
         payloadMaghrib = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
-                      "include_player_ids": MagribplayerID,
-                      "contents": {"en": "Salat Start",
-                                   "ru": "Lorem ipsum dolor amit"},
-                      "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                      "headings": {"en": "Maghrib"}}
+                          "include_player_ids": MagribplayerID,
+                          "contents": {"en": "Salat Start",
+                                       "ru": "Lorem ipsum dolor amit"},
+                          "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+                          "headings": {"en": "Maghrib"}}
         payloadDhuhr = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
-                      "include_player_ids": DhuhrplayerID,
-                      "contents": {"en": "Salat Start",
-                                   "ru": "Lorem ipsum dolor amit"},
-                      "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                      "headings": {"en": "Dhuhr"}}
+                        "include_player_ids": DhuhrplayerID,
+                        "contents": {"en": "Salat Start",
+                                     "ru": "Lorem ipsum dolor amit"},
+                        "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+                        "headings": {"en": "Dhuhr"}}
         payloadIsha = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
-                      "include_player_ids": IshaplayerID,
-                      "contents": {"en": "Salat Start",
-                                   "ru": "Lorem ipsum dolor amit"},
-                      "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                      "headings": {"en": "Isha"}}
+                       "include_player_ids": IshaplayerID,
+                       "contents": {"en": "Salat Start",
+                                    "ru": "Lorem ipsum dolor amit"},
+                       "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+                       "headings": {"en": "Isha"}}
 
         req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payload))
         req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payloadIsha))
         req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payloadDhuhr))
-        req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payloadMaghrib))
+        req = requests.post("https://onesignal.com/api/v1/notifications", headers=header,
+                            data=json.dumps(payloadMaghrib))
         req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payloadAsr))

@@ -29,3 +29,7 @@ class EmployeeAdmin(ImportExportModelAdmin):
 @admin.register(models.Country_List)
 class EmployeeAdmin(ImportExportModelAdmin):
     pass
+
+@admin.register(models.update_Salat_Time_List)
+class EmployeeAdmin(ImportExportModelAdmin):
+    pass

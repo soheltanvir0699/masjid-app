@@ -84,6 +84,23 @@ class Country_List(models.Model):
         return self.country_name
 
 
+class update_Salat_Time_List(models.Model):
+    update_date = models.DateField(blank=False, null=False)
+    Fajr = models.TimeField(auto_created=False, blank=False, null=False)
+    Sunrise = models.TimeField(auto_created=False, blank=True, null=True)
+    Dhuhr = models.TimeField(auto_created=False, blank=False, null=False)
+    Asr = models.TimeField(auto_created=False, blank=False, null=False)
+    Sunset = models.TimeField(auto_created=False, blank=True, null=True)
+    Maghrib = models.TimeField(auto_created=False, blank=False, null=False)
+    Isha = models.TimeField(auto_created=False, blank=False, null=False)
+    Imsak = models.TimeField(auto_created=False, blank=True, null=True)
+    user_id = models.ForeignKey(User_model, on_delete=models.CASCADE, limit_choices_to={'is_creator': True},
+                                related_name="Salat_time_1")
+
+    def __str__(self):
+        return self.user_id.name
+
+
 class Salat_Time_List(models.Model):
     mosque_name = models.CharField(max_length=200)
     mosque_icon = models.ImageField(null=True)

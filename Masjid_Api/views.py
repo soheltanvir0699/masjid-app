@@ -26,10 +26,11 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
-from .models import User_model, Salat_Time_List, Favorite_Time_List, Country_List
+from .models import User_model, Salat_Time_List, Favorite_Time_List, Country_List, update_Salat_Time_List
 from .serializers import LoginSerializer, SingleUserSerializer, UserSerializer, Salat_Times_Serializer, Fav_Serializer
 import requests
 from ipware import get_client_ip
+from .jobs import updater
 
 # Create your views here.
 
@@ -494,6 +495,51 @@ class update_masjid(APIView):
         return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
                         status=status.HTTP_202_ACCEPTED)
 
+class create_masjid_date_list(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        print(request.user.id)
+        try:
+            date = request.data['date']
+        except:
+            return Response({"success": False, "message": "Id is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            fajr_date = request.data['Fajr']
+        except:
+            return Response({"success": False, "message": "Fajr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            dhuhr_date = request.data['Dhuhr']
+        except:
+            return Response({"success": False, "message": "Dhuhr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            asr_date = request.data['Asr']
+        except:
+            return Response({"success": False, "message": "Asr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            maghrib_date = request.data['Maghrib']
+        except:
+            return Response({"success": False, "message": "Maghrib time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            isha_date = request.data['Isha']
+        except:
+            return Response({"success": False, "message": "Isha time is empty."}, status=status.HTTP_202_ACCEPTED)
+
+        user = User_model.object.get(id=request.user.id)
+        try:
+           update_Salat_Time_List.objects.create(user_id=user,update_date=date,Fajr=fajr_date, Dhuhr=dhuhr_date, Asr=asr_date,Maghrib=maghrib_date, Isha=isha_date)
+           return Response({"success": True, "message": "Successful date save."},
+                        status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response({"success": False, "message": "Unsuccessful date save."},
+                            status=status.HTTP_202_ACCEPTED)
+import datetime
+class startSch(APIView):
+    def get(self,request):
+        updater.start()
+        return Response({"success": True, "message": "started sch."},
+                        status=status.HTTP_202_ACCEPTED)
 
 class Salat_Times(APIView):
     authentication_classes = [TokenAuthentication]

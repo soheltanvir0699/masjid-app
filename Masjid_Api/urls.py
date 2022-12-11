@@ -24,9 +24,6 @@ urlpatterns = [
     path(r'api/remove-masjid/', views.RemoveMasjidView.as_view(), name='removeMasjid'),
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
     path(r'api/remove-fav-fav/', views.RemoveWithFavToFavView.as_view(), name='removeFavFav'),
-
+    path(r'api/create-sch-masjid/', views.create_masjid_date_list.as_view(), name='create_masjid'),
+    path(r'api/start-sch/', views.startSch.as_view(), name='startSch'),
 ]
-
-from .jobs import updater
-
-updater.start()
