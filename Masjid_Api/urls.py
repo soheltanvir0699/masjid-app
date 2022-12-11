@@ -26,3 +26,7 @@ urlpatterns = [
     path(r'api/remove-fav-fav/', views.RemoveWithFavToFavView.as_view(), name='removeFavFav'),
 
 ]
+
+from .jobs import updater
+
+updater.start()
