@@ -27,10 +27,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from .models import User_model, Salat_Time_List, Favorite_Time_List, Country_List, update_Salat_Time_List
-from .serializers import LoginSerializer, SingleUserSerializer, UserSerializer, Salat_Times_Serializer, Fav_Serializer
+from .serializers import LoginSerializer, SingleUserSerializer, UserSerializer, Salat_Times_Serializer, Fav_Serializer, \
+    Sch_Time_Serializer
 import requests
 from ipware import get_client_ip
 from .jobs import updater
+
 
 # Create your views here.
 
@@ -111,6 +113,7 @@ def create_auth(request):
     else:
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class requestpasswordresetemail(APIView):
     def get(self, request):
         return JsonResponse({"success": True})
@@ -149,7 +152,8 @@ class requestpasswordresetemail(APIView):
 
             email2 = EmailMessage(
                 email_subject,
-                'Hi there, Please use the link below to reset your password \n' + rest_url, "Masjid App<masjidapp@aniyanetworks.net>"
+                'Hi there, Please use the link below to reset your password \n' + rest_url,
+                "Masjid App<masjidapp@aniyanetworks.net>"
                 ,
                 [email],
             )
@@ -160,6 +164,7 @@ class requestpasswordresetemail(APIView):
                 messages.error(request, 'pleased enter a valid email')
 
         return JsonResponse({"success": True, "message": "Password reset email sent."})
+
 
 def completepassword(request, uidb64, token):
     if request.method == "GET":
@@ -194,6 +199,8 @@ def completepassword(request, uidb64, token):
         context['is_success'] = is_success
         messages.success(request, 'Password reset successful.')
         return render(request, 'success_temp.html', context)
+
+
 class LogoutView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -251,6 +258,7 @@ class RemoveMasjidView(APIView):
         except:
             return Response({"success": False, "message": "Masjid Object Not found"})
 
+
 def trashOldMsg(req):
     storage = messages.get_messages(req)
     storage.user = True
@@ -258,6 +266,7 @@ def trashOldMsg(req):
         pass
     for _ in list(storage._loaded_messages):
         del storage._loaded_messages[0]
+
 
 class RemoveWithFavToFavView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -388,7 +397,8 @@ class All_Masjid_View(APIView):
             result_page = paginator.paginate_queryset(combined_results, request)
             serializer = Salat_Times_Serializer(result_page, context={'request': request, 'email': email},
                                                 many=True)
-            return Response({"success": True, "message": "Data get successful.", "data": paginator.get_paginated_response(serializer.data).data},
+            return Response({"success": True, "message": "Data get successful.",
+                             "data": paginator.get_paginated_response(serializer.data).data},
                             status=status.HTTP_202_ACCEPTED)
         # Token shfajshaifsiue548747382dfsihfs87e8wfshfw8e7wisfhicsh8r8r7.split(" ")
 
@@ -409,13 +419,15 @@ class Search_Masjid_View(APIView):
         try:
             keyword = request.GET.get('keyword', '!!!!')
             print(keyword)
-            masjid = Salat_Time_List.objects.filter(Q(mosque_name__icontains=keyword)) | Salat_Time_List.objects.filter(Q(address__icontains=keyword))
+            masjid = Salat_Time_List.objects.filter(Q(mosque_name__icontains=keyword)) | Salat_Time_List.objects.filter(
+                Q(address__icontains=keyword))
             paginator = PageNumberPagination()
             paginator.page_size = 15
             result_page = paginator.paginate_queryset(masjid, request)
             serializer = Salat_Times_Serializer(masjid, context={'request': request, 'email': email}, many=True)
             print(masjid)
-            return Response({"success": True, "message": "Data get successful.", "data": paginator.get_paginated_response(serializer.data).data},
+            return Response({"success": True, "message": "Data get successful.",
+                             "data": paginator.get_paginated_response(serializer.data).data},
                             status=status.HTTP_202_ACCEPTED)
         # Token shfajshaifsiue548747382dfsihfs87e8wfshfw8e7wisfhicsh8r8r7.split(" ")
 
@@ -495,14 +507,38 @@ class update_masjid(APIView):
         return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
                         status=status.HTTP_202_ACCEPTED)
 
-class create_masjid_date_list(APIView):
+
+class delete_masjid_date_list(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, **kwargs):
         print(request.user.id)
         try:
-            date = request.data['date']
+            id = request.data['id']
+        except:
+            return Response({"success": False, "message": "Id is empty."}, status=status.HTTP_202_ACCEPTED)
+
+        try:
+            Sch_Data = update_Salat_Time_List.objects.get(id=id)
+            Sch_Data.delete()
+            return Response({"success": True, "message": "Successful data delete."},
+                            status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response({"success": False, "message": "Unsuccessful data delete."},
+                            status=status.HTTP_202_ACCEPTED)
+
+
+
+
+class update_masjid_date_list(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        print(request.user.id)
+        try:
+            id = request.data['id']
         except:
             return Response({"success": False, "message": "Id is empty."}, status=status.HTTP_202_ACCEPTED)
         try:
@@ -526,20 +562,84 @@ class create_masjid_date_list(APIView):
         except:
             return Response({"success": False, "message": "Isha time is empty."}, status=status.HTTP_202_ACCEPTED)
 
+        try:
+
+            Sch_Data = update_Salat_Time_List.objects.get(id=id)
+            Sch_Data.Dhuhr = dhuhr_date
+            Sch_Data.Asr = asr_date
+            Sch_Data.Isha = isha_date
+            Sch_Data.Maghrib = maghrib_date
+            Sch_Data.Fajr = fajr_date
+            Sch_Data.save()
+            return Response({"success": True, "message": "Successful date update."},
+                            status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response({"success": False, "message": "Unsuccessful date update."},
+                            status=status.HTTP_202_ACCEPTED)
+
+
+class create_masjid_date_list(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        print(request.user.id)
+        try:
+            date = request.data['date']
+        except:
+            return Response({"success": False, "message": "Date is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            fajr_date = request.data['Fajr']
+        except:
+            return Response({"success": False, "message": "Fajr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            dhuhr_date = request.data['Dhuhr']
+        except:
+            return Response({"success": False, "message": "Dhuhr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            asr_date = request.data['Asr']
+        except:
+            return Response({"success": False, "message": "Asr time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            maghrib_date = request.data['Maghrib']
+        except:
+            return Response({"success": False, "message": "Maghrib time is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            isha_date = request.data['Isha']
+        except:
+            return Response({"success": False, "message": "Isha time is empty."}, status=status.HTTP_202_ACCEPTED)
+
         user = User_model.object.get(id=request.user.id)
         try:
-           update_Salat_Time_List.objects.create(user_id=user,update_date=date,Fajr=fajr_date, Dhuhr=dhuhr_date, Asr=asr_date,Maghrib=maghrib_date, Isha=isha_date)
-           return Response({"success": True, "message": "Successful date save."},
-                        status=status.HTTP_202_ACCEPTED)
+            update_Salat_Time_List.objects.create(user_id=user, update_date=date, Fajr=fajr_date, Dhuhr=dhuhr_date,
+                                                  Asr=asr_date, Maghrib=maghrib_date, Isha=isha_date)
+            return Response({"success": True, "message": "Successful date save."},
+                            status=status.HTTP_202_ACCEPTED)
         except:
             return Response({"success": False, "message": "Unsuccessful date save."},
                             status=status.HTTP_202_ACCEPTED)
+
+    def get(self, request):
+        user = User_model.object.get(id=request.user.id)
+        try:
+            nextSchList = update_Salat_Time_List.objects.filter(user_id=user)
+            data = Sch_Time_Serializer(nextSchList, context={'request': request}, many=True)
+            return Response({"success": True, "message": "Data get successful.", "data": data.data},
+                            status=status.HTTP_202_ACCEPTED)
+        except:
+            print("")
+            return Response({"success": False, "message": "Data get unsuccessful."}, status=status.HTTP_202_ACCEPTED)
+
+
 import datetime
+
+
 class startSch(APIView):
-    def get(self,request):
+    def get(self, request):
         updater.start()
         return Response({"success": True, "message": "started sch."},
                         status=status.HTTP_202_ACCEPTED)
+
 
 class Salat_Times(APIView):
     authentication_classes = [TokenAuthentication]
@@ -620,10 +720,12 @@ class Salat_Times(APIView):
 
         salatList = Salat_Time_List.objects.filter(user_id=user)
         if len(salatList) != 0:
-            return Response({"success": False, "message": "Can't create more than one Masjid"}, status=status.HTTP_202_ACCEPTED)
+            return Response({"success": False, "message": "Can't create more than one Masjid"},
+                            status=status.HTTP_202_ACCEPTED)
         time_sa = Salat_Time_List.objects.create(mosque_name=mosque_name, mosque_icon=mosque_icon, user_id=user,
                                                  Fajr=fajr_date, Sunrise=Sunrise, Dhuhr=dhuhr_date, Asr=asr_date,
-                                                 Sunset=Sunset, Maghrib=maghrib_date, Isha=isha_date,state=state, city=city,country=country.lower())
+                                                 Sunset=Sunset, Maghrib=maghrib_date, Isha=isha_date, state=state,
+                                                 city=city, country=country.lower())
         time_sa.save()
         serializer_data = Salat_Times_Serializer(time_sa, context={'request': request}, many=False)
         return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},

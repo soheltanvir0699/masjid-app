@@ -26,4 +26,6 @@ urlpatterns = [
     path(r'api/remove-fav-fav/', views.RemoveWithFavToFavView.as_view(), name='removeFavFav'),
     path(r'api/create-sch-masjid/', views.create_masjid_date_list.as_view(), name='create_masjid'),
     path(r'api/start-sch/', views.startSch.as_view(), name='startSch'),
+    path(r'api/update_sch_masjid/', views.update_masjid_date_list.as_view(), name='updateSch'),
+    path(r'api/delete_sch_masjid/', views.delete_masjid_date_list.as_view(), name='deleteSch'),
 ]
