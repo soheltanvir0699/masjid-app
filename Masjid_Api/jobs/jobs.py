@@ -23,7 +23,28 @@ def updateMasjid():
                 data.delete()
             except:
                 print("")
-    print("")
+
+
+            subs_users = models.Favorite_Time_List.objects.filter(salat_Id==salat_list_data)
+            userId = []
+            masjid_name = ""
+            for user in subs_users:
+                if masjid_name != "":
+                    masjid_name = user.salat_Id.mosque_name
+                if user.user_id.onesignal_id not in userId:
+                    if user.user_id.onesignal_id != "":
+                        userId.append(user.user_id.onesignal_id)
+            header = {"Content-Type": "application/json; charset=utf-8"}
+
+            payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+                       "include_player_ids": userId,
+                       "contents": {"en": "Your salat time Changed.",
+                                    "ru": "Lorem ipsum dolor amit"},
+                       "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+                       "headings": {"en": masjid_name + " time is now updated."}}
+
+            req = requests.post("https://onesignal.com/api/v1/notifications", headers=header,
+                                data=json.dumps(payload))
 
 
 def schedule_api():
@@ -101,47 +122,50 @@ def schedule_api():
             #     if list.user_id.onesignal_id not in playerID:
             #         if list.user_id.onesignal_id != "":
             #             playerID.append(list.user_id.onesignal_id)
+    header = {"Content-Type": "application/json; charset=utf-8"}
 
-    if len(playerID) != 0:
-        # print(playerID)
-        print(len(playerID))
-
-        header = {"Content-Type": "application/json; charset=utf-8"}
-
-        payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
-                   "include_player_ids": FajrplayerID,
-                   "contents": {"en": "Salat Start",
-                                "ru": "Lorem ipsum dolor amit"},
-                   "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                   "headings": {"en": "Fajr"}}
-        payloadAsr = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
-                      "include_player_ids": AsrplayerID,
+    payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+               "include_player_ids": FajrplayerID,
+               "contents": {"en": "Salat Start",
+                            "ru": "Lorem ipsum dolor amit"},
+               "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+               "headings": {"en": "Fajr"}}
+    payloadAsr = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+                  "include_player_ids": AsrplayerID,
+                  "contents": {"en": "Salat Start",
+                               "ru": "Lorem ipsum dolor amit"},
+                  "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+                  "headings": {"en": "Asr"}}
+    payloadMaghrib = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+                      "include_player_ids": MagribplayerID,
                       "contents": {"en": "Salat Start",
                                    "ru": "Lorem ipsum dolor amit"},
                       "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                      "headings": {"en": "Asr"}}
-        payloadMaghrib = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
-                          "include_player_ids": MagribplayerID,
-                          "contents": {"en": "Salat Start",
-                                       "ru": "Lorem ipsum dolor amit"},
-                          "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                          "headings": {"en": "Maghrib"}}
-        payloadDhuhr = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
-                        "include_player_ids": DhuhrplayerID,
-                        "contents": {"en": "Salat Start",
-                                     "ru": "Lorem ipsum dolor amit"},
-                        "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                        "headings": {"en": "Dhuhr"}}
-        payloadIsha = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
-                       "include_player_ids": IshaplayerID,
-                       "contents": {"en": "Salat Start",
-                                    "ru": "Lorem ipsum dolor amit"},
-                       "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                       "headings": {"en": "Isha"}}
+                      "headings": {"en": "Maghrib"}}
+    payloadDhuhr = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+                    "include_player_ids": DhuhrplayerID,
+                    "contents": {"en": "Salat Start",
+                                 "ru": "Lorem ipsum dolor amit"},
+                    "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+                    "headings": {"en": "Dhuhr"}}
+    payloadIsha = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+                   "include_player_ids": IshaplayerID,
+                   "contents": {"en": "Salat Start",
+                                "ru": "Lorem ipsum dolor amit"},
+                   "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+                   "headings": {"en": "Isha"}}
 
+    if len(FajrplayerID) != 0:
         req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payload))
-        req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payloadIsha))
-        req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payloadDhuhr))
+    if len(AsrplayerID) != 0:
+        req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payloadAsr))
+
+    if len(MagribplayerID) != 0:
         req = requests.post("https://onesignal.com/api/v1/notifications", headers=header,
                             data=json.dumps(payloadMaghrib))
-        req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payloadAsr))
+
+    if len(DhuhrplayerID) != 0:
+        req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payloadDhuhr))
+
+    if len(IshaplayerID) != 0:
+        req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payloadIsha))
