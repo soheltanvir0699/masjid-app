@@ -648,13 +648,13 @@ class TimeZone_Times(APIView):
             r = requests.get(url)
             user.time_zone = r.json()["country"].lower()
             user.save()
-            return Response({"success": True, "time_zone": r.json()["country"].lower()}, status=status.HTTP_202_ACCEPTED)
+            return Response({"success": True, "time_zone": r.json()["timezone"].lower(), "country": r.json()["country"]}, status=status.HTTP_202_ACCEPTED)
         except:
             client_ip, is_routable = get_client_ip(request)
             url = f'https://api.ipfind.com/?ip={client_ip}'
             # url = f'https://api.ipfind.com/?ip=116.204.228.142'
             r = requests.get(url)
-            return Response({"success": True, "time_zone": r.json()["country"].lower()}, status=status.HTTP_202_ACCEPTED)
+            return Response({"success": True, "time_zone": r.json()["timezone"].lower(), "country": r.json()["country"]}, status=status.HTTP_202_ACCEPTED)
 
 
 
