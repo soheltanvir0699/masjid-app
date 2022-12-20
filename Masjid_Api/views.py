@@ -643,16 +643,16 @@ class TimeZone_Times(APIView):
         try:
             user = User_model.object.get(id=request.user.id)
             client_ip, is_routable = get_client_ip(request)
-            # url = f'https://api.ipfind.com/?ip={client_ip}'
-            url = f'https://api.ipfind.com/?ip=116.204.228.142'
+            url = f'https://api.ipfind.com/?ip={client_ip}'
+            # url = f'https://api.ipfind.com/?ip=116.204.228.142'
             r = requests.get(url)
             user.time_zone = r.json()["country"].lower()
             user.save()
             return Response({"success": True, "time_zone": r.json()["country"].lower()}, status=status.HTTP_202_ACCEPTED)
         except:
             client_ip, is_routable = get_client_ip(request)
-            # url = f'https://api.ipfind.com/?ip={client_ip}'
-            url = f'https://api.ipfind.com/?ip=116.204.228.142'
+            url = f'https://api.ipfind.com/?ip={client_ip}'
+            # url = f'https://api.ipfind.com/?ip=116.204.228.142'
             r = requests.get(url)
             return Response({"success": True, "time_zone": r.json()["country"].lower()}, status=status.HTTP_202_ACCEPTED)
 
