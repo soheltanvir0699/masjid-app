@@ -25,7 +25,7 @@ def updateMasjid():
                 print("")
 
 
-            subs_users = models.Favorite_Time_List.objects.filter(salat_Id==salat_list_data)
+            subs_users = models.Favorite_Time_List.objects.filter(salat_Id=salat_list_data)
             userId = []
             masjid_name = ""
             for user in subs_users:
