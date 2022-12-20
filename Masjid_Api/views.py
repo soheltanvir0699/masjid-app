@@ -400,7 +400,6 @@ class All_Masjid_View(APIView):
             return Response({"success": True, "message": "Data get successful.",
                              "data": paginator.get_paginated_response(serializer.data).data},
                             status=status.HTTP_202_ACCEPTED)
-        # Token shfajshaifsiue548747382dfsihfs87e8wfshfw8e7wisfhicsh8r8r7.split(" ")
 
         except:
             return Response({"success": False, "message": "Data get unsuccessful."})
@@ -529,8 +528,6 @@ class delete_masjid_date_list(APIView):
                             status=status.HTTP_202_ACCEPTED)
 
 
-
-
 class update_masjid_date_list(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -641,6 +638,26 @@ class startSch(APIView):
                         status=status.HTTP_202_ACCEPTED)
 
 
+class TimeZone_Times(APIView):
+    def get(self, request, **kwargs):
+        try:
+            user = User_model.object.get(id=request.user.id)
+            client_ip, is_routable = get_client_ip(request)
+            # url = f'https://api.ipfind.com/?ip={client_ip}'
+            url = f'https://api.ipfind.com/?ip=116.204.228.142'
+            r = requests.get(url)
+            user.time_zone = r.json()["country"].lower()
+            user.save()
+            return Response({"success": True, "time_zone": r.json()["country"].lower()}, status=status.HTTP_202_ACCEPTED)
+        except:
+            client_ip, is_routable = get_client_ip(request)
+            # url = f'https://api.ipfind.com/?ip={client_ip}'
+            url = f'https://api.ipfind.com/?ip=116.204.228.142'
+            r = requests.get(url)
+            return Response({"success": True, "time_zone": r.json()["country"].lower()}, status=status.HTTP_202_ACCEPTED)
+
+
+
 class Salat_Times(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -722,14 +739,18 @@ class Salat_Times(APIView):
         if len(salatList) != 0:
             return Response({"success": False, "message": "Can't create more than one Masjid"},
                             status=status.HTTP_202_ACCEPTED)
-        time_sa = Salat_Time_List.objects.create(mosque_name=mosque_name, mosque_icon=mosque_icon, user_id=user,
-                                                 Fajr=fajr_date, Sunrise=Sunrise, Dhuhr=dhuhr_date, Asr=asr_date,
-                                                 Sunset=Sunset, Maghrib=maghrib_date, Isha=isha_date, state=state,
-                                                 city=city, country=country.lower())
-        time_sa.save()
-        serializer_data = Salat_Times_Serializer(time_sa, context={'request': request}, many=False)
-        return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
-                        status=status.HTTP_202_ACCEPTED)
+        if country.lower() == r.json()["country"].lower():
+            time_sa = Salat_Time_List.objects.create(mosque_name=mosque_name, mosque_icon=mosque_icon, user_id=user,
+                                                     Fajr=fajr_date, Sunrise=Sunrise, Dhuhr=dhuhr_date, Asr=asr_date,
+                                                     Sunset=Sunset, Maghrib=maghrib_date, Isha=isha_date, state=state,
+                                                     city=city, country=country.lower())
+            time_sa.save()
+            serializer_data = Salat_Times_Serializer(time_sa, context={'request': request}, many=False)
+            return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
+                            status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response({"success": False, "message": "Masjid TimeZone not match with your TimeZone.", "data": []},
+                            status=status.HTTP_202_ACCEPTED)
 
     def get(self, request, **kwargs):
 

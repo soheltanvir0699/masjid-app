@@ -28,4 +28,5 @@ urlpatterns = [
     path(r'api/start-sch/', views.startSch.as_view(), name='startSch'),
     path(r'api/update_sch_masjid/', views.update_masjid_date_list.as_view(), name='updateSch'),
     path(r'api/delete_sch_masjid/', views.delete_masjid_date_list.as_view(), name='deleteSch'),
+    path(r'api/update_timezone/', views.TimeZone_Times.as_view(), name='timezone'),
 ]

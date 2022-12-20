@@ -42,6 +42,7 @@ class User_model(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     onesignal_id = models.CharField(max_length=300, null=True, blank=True)
+    time_zone = models.CharField(max_length=100, null=True, blank=True)
     image = models.ImageField(upload_to='image/user_pic/%y/%m/%d', null=True, blank=True)
 
     USERNAME_FIELD = 'email'
