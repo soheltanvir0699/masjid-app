@@ -8,7 +8,7 @@ from Masjid_Api import models
 
 def updateMasjid():
     current_date = datetime.datetime.now().strftime('%Y-%m-%d')
-    current_updated_date = models.update_Salat_Time_List.objects.filter(update_date=current_date)
+    current_updated_date = models.update_Salat_Time_List.objects.filter(update_date=current_date, is_expired=False)
     if len(current_updated_date) != 0:
         for data in current_updated_date:
             current_user = models.User_model.objects.get(id=data.user_id.id)
@@ -20,7 +20,8 @@ def updateMasjid():
                 salat_list_data.Asr = data.Asr
                 salat_list_data.Dhuhr = data.Dhuhr
                 salat_list_data.save()
-                data.delete()
+                data.is_expired = True
+                data.save()
             except:
                 print("")
 

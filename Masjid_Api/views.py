@@ -5,6 +5,7 @@ from itertools import chain
 from django.db.models import Q
 from django.shortcuts import render
 from datetime import datetime
+import json
 from django.contrib import messages, auth
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
@@ -30,6 +31,7 @@ from .models import User_model, Salat_Time_List, Favorite_Time_List, Country_Lis
 from .serializers import LoginSerializer, SingleUserSerializer, UserSerializer, Salat_Times_Serializer, Fav_Serializer, \
     Sch_Time_Serializer
 import requests
+import time
 from ipware import get_client_ip
 from .jobs import updater
 
@@ -491,20 +493,46 @@ class update_masjid(APIView):
         except:
             return Response({"success": False, "message": "Masjid Not Found."}, status=status.HTTP_202_ACCEPTED)
 
-        current_masjid.mosque_name = mosque_name
-        current_masjid.mosque_icon = mosque_icon
-        current_masjid.Fajr = fajr_date
-        current_masjid.Dhuhr = dhuhr_date
-        current_masjid.Asr = asr_date
-        current_masjid.Maghrib = maghrib_date
-        current_masjid.Isha = isha_date
-        current_masjid.state = state
-        current_masjid.city = city
-        current_masjid.country = country
-        current_masjid.save()
-        serializer_data = Salat_Times_Serializer(current_masjid, context={'request': request}, many=False)
-        return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
-                        status=status.HTTP_202_ACCEPTED)
+        try:
+            current_masjid.mosque_name = mosque_name
+            current_masjid.mosque_icon = mosque_icon
+            current_masjid.Fajr = fajr_date
+            current_masjid.Dhuhr = dhuhr_date
+            current_masjid.Asr = asr_date
+            current_masjid.Maghrib = maghrib_date
+            current_masjid.Isha = isha_date
+            current_masjid.state = state
+            current_masjid.city = city
+            current_masjid.country = country
+            current_masjid.save()
+            try:
+                subs_users = Favorite_Time_List.objects.filter(salat_Id=current_masjid)
+                userId = []
+                for user in subs_users:
+                    if user.user_id.onesignal_id not in userId:
+                        if user.user_id.onesignal_id != "":
+                            userId.append(user.user_id.onesignal_id)
+                header = {"Content-Type": "application/json; charset=utf-8"}
+
+                payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+                           "include_player_ids": userId,
+                           "contents": {"en": "Your salat time Changed.",
+                                        "ru": "Lorem ipsum dolor amit"},
+                           "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+                           "headings": {"en": current_masjid.mosque_name + " time is now updated."}}
+
+                req = requests.post("https://onesignal.com/api/v1/notifications", headers=header,
+                                    data=json.dumps(payload))
+            except:
+                print()
+            serializer_data = Salat_Times_Serializer(current_masjid, context={'request': request}, many=False)
+            return Response({"success": True, "message": "Successful date save.", "data": serializer_data.data},
+                            status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response({"success": False, "message": "Unsuccessful date save."},
+                            status=status.HTTP_200_OK)
+
+
 
 
 class delete_masjid_date_list(APIView):
@@ -535,6 +563,10 @@ class update_masjid_date_list(APIView):
     def post(self, request, **kwargs):
         print(request.user.id)
         try:
+            date = request.data['date']
+        except:
+            return Response({"success": False, "message": "Date is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
             id = request.data['id']
         except:
             return Response({"success": False, "message": "Id is empty."}, status=status.HTTP_202_ACCEPTED)
@@ -560,13 +592,22 @@ class update_masjid_date_list(APIView):
             return Response({"success": False, "message": "Isha time is empty."}, status=status.HTTP_202_ACCEPTED)
 
         try:
+            current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+            newdate1 = time.strptime(current_date, "%Y-%m-%d")
+            newdate2 = time.strptime(date, "%Y-%m-%d")
 
             Sch_Data = update_Salat_Time_List.objects.get(id=id)
+            Sch_Data.update_date = date
             Sch_Data.Dhuhr = dhuhr_date
             Sch_Data.Asr = asr_date
             Sch_Data.Isha = isha_date
             Sch_Data.Maghrib = maghrib_date
             Sch_Data.Fajr = fajr_date
+            if newdate2 > newdate1:
+                Sch_Data.is_expired = False
+                print(current_date)
+            else:
+                Sch_Data.is_expired = True
             Sch_Data.save()
             return Response({"success": True, "message": "Successful date update."},
                             status=status.HTTP_202_ACCEPTED)
@@ -608,10 +649,19 @@ class create_masjid_date_list(APIView):
 
         user = User_model.object.get(id=request.user.id)
         try:
-            update_Salat_Time_List.objects.create(user_id=user, update_date=date, Fajr=fajr_date, Dhuhr=dhuhr_date,
-                                                  Asr=asr_date, Maghrib=maghrib_date, Isha=isha_date)
-            return Response({"success": True, "message": "Successful date save."},
-                            status=status.HTTP_202_ACCEPTED)
+            current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+            newdate1 = time.strptime(current_date, "%Y-%m-%d")
+            newdate2 = time.strptime(date, "%Y-%m-%d")
+            if newdate2 > newdate1:
+                print(current_date)
+                update_Salat_Time_List.objects.create(user_id=user, update_date=date, Fajr=fajr_date, Dhuhr=dhuhr_date,
+                                                      Asr=asr_date, Maghrib=maghrib_date, Isha=isha_date)
+                return Response({"success": True, "message": "Successful date save."},
+                                status=status.HTTP_202_ACCEPTED)
+            else:
+                return Response({"success": False, "message": "Select Next days Date."},
+                                status=status.HTTP_202_ACCEPTED)
+
         except:
             return Response({"success": False, "message": "Unsuccessful date save."},
                             status=status.HTTP_202_ACCEPTED)

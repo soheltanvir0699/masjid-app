@@ -97,6 +97,7 @@ class update_Salat_Time_List(models.Model):
     Imsak = models.TimeField(auto_created=False, blank=True, null=True)
     user_id = models.ForeignKey(User_model, on_delete=models.CASCADE, limit_choices_to={'is_creator': True},
                                 related_name="Salat_time_1")
+    is_expired = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user_id.name
