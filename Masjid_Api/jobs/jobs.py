@@ -39,10 +39,10 @@ def updateMasjid():
 
             payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
                        "include_player_ids": userId,
-                       "contents": {"en": "Your salat time Changed.",
+                       "contents": {"en": masjid_name + " time is now updated.",
                                     "ru": "Lorem ipsum dolor amit"},
                        "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                       "headings": {"en": masjid_name + " time is now updated."}}
+                       "headings": {"en": "Your salat time Changed."}}
 
             req = requests.post("https://onesignal.com/api/v1/notifications", headers=header,
                                 data=json.dumps(payload))

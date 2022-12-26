@@ -516,10 +516,10 @@ class update_masjid(APIView):
 
                 payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
                            "include_player_ids": userId,
-                           "contents": {"en": "Your salat time Changed.",
+                           "contents": {"en": current_masjid.mosque_name + " time is now updated.",
                                         "ru": "Lorem ipsum dolor amit"},
                            "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                           "headings": {"en": current_masjid.mosque_name + " time is now updated."}}
+                           "headings": {"en": "Your salat time Changed." }}
 
                 req = requests.post("https://onesignal.com/api/v1/notifications", headers=header,
                                     data=json.dumps(payload))
@@ -531,8 +531,6 @@ class update_masjid(APIView):
         except:
             return Response({"success": False, "message": "Unsuccessful date save."},
                             status=status.HTTP_200_OK)
-
-
 
 
 class delete_masjid_date_list(APIView):
@@ -698,14 +696,17 @@ class TimeZone_Times(APIView):
             r = requests.get(url)
             user.time_zone = r.json()["country"].lower()
             user.save()
-            return Response({"success": True, "time_zone": r.json()["timezone"].lower(), "country": r.json()["country"]}, status=status.HTTP_202_ACCEPTED)
+            return Response(
+                {"success": True, "time_zone": r.json()["timezone"].lower(), "country": r.json()["country"]},
+                status=status.HTTP_202_ACCEPTED)
         except:
             client_ip, is_routable = get_client_ip(request)
             url = f'https://api.ipfind.com/?ip={client_ip}'
             # url = f'https://api.ipfind.com/?ip=116.204.228.142'
             r = requests.get(url)
-            return Response({"success": True, "time_zone": r.json()["timezone"].lower(), "country": r.json()["country"]}, status=status.HTTP_202_ACCEPTED)
-
+            return Response(
+                {"success": True, "time_zone": r.json()["timezone"].lower(), "country": r.json()["country"]},
+                status=status.HTTP_202_ACCEPTED)
 
 
 class Salat_Times(APIView):
@@ -823,3 +824,45 @@ def activate(request, uidb64, token):
         return render(request, 'conformation_design.html')
     else:
         return render(request, 'conformation_design.html')
+
+
+class send_push_notification(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        user = User_model.object.get(id=request.user.id)
+        try:
+            title = request.data['title']
+        except:
+            return Response({"success": False, "message": "Push Title is empty."}, status=status.HTTP_200_OK)
+        try:
+            descriptions = request.data['descriptions']
+        except:
+            return Response({"success": False, "message": "Push Descriptions is empty."},
+                            status=status.HTTP_200_OK)
+        my_masjid = Salat_Time_List.objects.get(user_id=user)
+        try:
+            subs_users = Favorite_Time_List.objects.filter(salat_Id=my_masjid)
+            userId = ["b1e24206-4f29-42aa-bcd7-c354890b88b4"]
+            for user in subs_users:
+                if user.user_id.onesignal_id not in userId:
+                    if user.user_id.onesignal_id != "":
+                        userId.append(user.user_id.onesignal_id)
+            header = {"Content-Type": "application/json; charset=utf-8"}
+
+            payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+                       "include_player_ids": userId,
+                       "contents": {"en": descriptions,
+                                    "ru": "Lorem ipsum dolor amit"},
+                       "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
+                       "headings": {"en": title}}
+
+            req = requests.post("https://onesignal.com/api/v1/notifications", headers=header,
+                                data=json.dumps(payload))
+            return Response({"success": True, "message": "Push Send Successful.","data":req.json()},
+                            status=status.HTTP_200_OK)
+        except:
+            print()
+        return Response({"success": True, "message": "Push Send Successful."},
+                        status=status.HTTP_200_OK)
