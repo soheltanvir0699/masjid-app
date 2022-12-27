@@ -86,6 +86,7 @@ class Country_List(models.Model):
 
 
 class update_Salat_Time_List(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
     update_date = models.DateField(blank=False, null=False)
     Fajr = models.TimeField(auto_created=False, blank=False, null=False)
     Sunrise = models.TimeField(auto_created=False, blank=True, null=True)

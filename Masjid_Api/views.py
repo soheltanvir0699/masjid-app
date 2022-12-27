@@ -561,6 +561,10 @@ class update_masjid_date_list(APIView):
     def post(self, request, **kwargs):
         print(request.user.id)
         try:
+            name = request.data['name']
+        except:
+            return Response({"success": False, "message": "Name is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
             date = request.data['date']
         except:
             return Response({"success": False, "message": "Date is empty."}, status=status.HTTP_202_ACCEPTED)
@@ -597,6 +601,7 @@ class update_masjid_date_list(APIView):
             Sch_Data = update_Salat_Time_List.objects.get(id=id)
             Sch_Data.update_date = date
             Sch_Data.Dhuhr = dhuhr_date
+            Sch_Data.name = name
             Sch_Data.Asr = asr_date
             Sch_Data.Isha = isha_date
             Sch_Data.Maghrib = maghrib_date
@@ -625,6 +630,10 @@ class create_masjid_date_list(APIView):
         except:
             return Response({"success": False, "message": "Date is empty."}, status=status.HTTP_202_ACCEPTED)
         try:
+            name = request.data['name']
+        except:
+            return Response({"success": False, "message": "Name is empty."}, status=status.HTTP_202_ACCEPTED)
+        try:
             fajr_date = request.data['Fajr']
         except:
             return Response({"success": False, "message": "Fajr time is empty."}, status=status.HTTP_202_ACCEPTED)
@@ -652,7 +661,7 @@ class create_masjid_date_list(APIView):
             newdate2 = time.strptime(date, "%Y-%m-%d")
             if newdate2 > newdate1:
                 print(current_date)
-                update_Salat_Time_List.objects.create(user_id=user, update_date=date, Fajr=fajr_date, Dhuhr=dhuhr_date,
+                update_Salat_Time_List.objects.create(name=name, user_id=user, update_date=date, Fajr=fajr_date, Dhuhr=dhuhr_date,
                                                       Asr=asr_date, Maghrib=maghrib_date, Isha=isha_date)
                 return Response({"success": True, "message": "Successful date save."},
                                 status=status.HTTP_202_ACCEPTED)
