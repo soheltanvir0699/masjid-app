@@ -514,7 +514,7 @@ class update_masjid(APIView):
                             userId.append(user.user_id.onesignal_id)
                 header = {"Content-Type": "application/json; charset=utf-8"}
 
-                payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+                payload = {"app_id": "fa6ff648-7560-42e0-97ed-7d008e974c36",
                            "include_player_ids": userId,
                            "contents": {"en": current_masjid.mosque_name + " time is now updated.",
                                         "ru": "Lorem ipsum dolor amit"},
@@ -853,14 +853,14 @@ class send_push_notification(APIView):
         my_masjid = Salat_Time_List.objects.get(user_id=user)
         try:
             subs_users = Favorite_Time_List.objects.filter(salat_Id=my_masjid)
-            userId = ["b1e24206-4f29-42aa-bcd7-c354890b88b4"]
+            userId = []
             for user in subs_users:
                 if user.user_id.onesignal_id not in userId:
                     if user.user_id.onesignal_id != "":
                         userId.append(user.user_id.onesignal_id)
             header = {"Content-Type": "application/json; charset=utf-8"}
 
-            payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+            payload = {"app_id": "fa6ff648-7560-42e0-97ed-7d008e974c36",
                        "include_player_ids": userId,
                        "contents": {"en": descriptions,
                                     "ru": "Lorem ipsum dolor amit"},

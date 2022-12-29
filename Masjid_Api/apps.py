@@ -8,7 +8,9 @@ class MasjidApiConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'Masjid_Api'
 
-    # def ready(self):
+    def ready(self):
+        from .jobs import updater
+        updater.start()
     #     startScheduler = True
     #
     #     # check WEB_CONCURRENCY exists and is more than 1

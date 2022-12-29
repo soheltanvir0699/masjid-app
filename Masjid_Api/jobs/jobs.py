@@ -37,7 +37,7 @@ def updateMasjid():
                         userId.append(user.user_id.onesignal_id)
             header = {"Content-Type": "application/json; charset=utf-8"}
 
-            payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+            payload = {"app_id": "fa6ff648-7560-42e0-97ed-7d008e974c36",
                        "include_player_ids": userId,
                        "contents": {"en": masjid_name + " time is now updated.",
                                     "ru": "Lorem ipsum dolor amit"},
@@ -125,31 +125,31 @@ def schedule_api():
             #             playerID.append(list.user_id.onesignal_id)
     header = {"Content-Type": "application/json; charset=utf-8"}
 
-    payload = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+    payload = {"app_id": "fa6ff648-7560-42e0-97ed-7d008e974c36",
                "include_player_ids": FajrplayerID,
                "contents": {"en": "Salat Start",
                             "ru": "Lorem ipsum dolor amit"},
                "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
                "headings": {"en": "Fajr"}}
-    payloadAsr = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+    payloadAsr = {"app_id": "fa6ff648-7560-42e0-97ed-7d008e974c36",
                   "include_player_ids": AsrplayerID,
                   "contents": {"en": "Salat Start",
                                "ru": "Lorem ipsum dolor amit"},
                   "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
                   "headings": {"en": "Asr"}}
-    payloadMaghrib = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+    payloadMaghrib = {"app_id": "fa6ff648-7560-42e0-97ed-7d008e974c36",
                       "include_player_ids": MagribplayerID,
                       "contents": {"en": "Salat Start",
                                    "ru": "Lorem ipsum dolor amit"},
                       "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
                       "headings": {"en": "Maghrib"}}
-    payloadDhuhr = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+    payloadDhuhr = {"app_id": "fa6ff648-7560-42e0-97ed-7d008e974c36",
                     "include_player_ids": DhuhrplayerID,
                     "contents": {"en": "Salat Start",
                                  "ru": "Lorem ipsum dolor amit"},
                     "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
                     "headings": {"en": "Dhuhr"}}
-    payloadIsha = {"app_id": "57490d06-e3e5-4095-ae60-0221224109b4",
+    payloadIsha = {"app_id": "fa6ff648-7560-42e0-97ed-7d008e974c36",
                    "include_player_ids": IshaplayerID,
                    "contents": {"en": "Salat Start",
                                 "ru": "Lorem ipsum dolor amit"},
