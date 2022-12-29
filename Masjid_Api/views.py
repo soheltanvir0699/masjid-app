@@ -65,6 +65,8 @@ class LoginView(APIView):
                     user.onesignal_id = request.data['user_id']
                     user.save()
                 except:
+                    user.onesignal_id = ""
+                    user.save()
                     print()
 
                 token = Token.objects.create(user=user)
@@ -514,7 +516,7 @@ class update_masjid(APIView):
                             userId.append(user.user_id.onesignal_id)
                 header = {"Content-Type": "application/json; charset=utf-8"}
 
-                payload = {"app_id": "fa6ff648-7560-42e0-97ed-7d008e974c36",
+                payload = {"app_id": "5aac78d8-4ad3-4314-bfae-dbed8d042a86",
                            "include_player_ids": userId,
                            "contents": {"en": current_masjid.mosque_name + " time is now updated.",
                                         "ru": "Lorem ipsum dolor amit"},
@@ -860,7 +862,7 @@ class send_push_notification(APIView):
                         userId.append(user.user_id.onesignal_id)
             header = {"Content-Type": "application/json; charset=utf-8"}
 
-            payload = {"app_id": "fa6ff648-7560-42e0-97ed-7d008e974c36",
+            payload = {"app_id": "5aac78d8-4ad3-4314-bfae-dbed8d042a86",
                        "include_player_ids": userId,
                        "contents": {"en": descriptions,
                                     "ru": "Lorem ipsum dolor amit"},
