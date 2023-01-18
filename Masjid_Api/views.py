@@ -36,6 +36,8 @@ from ipware import get_client_ip
 from .jobs import updater
 
 app_id = "c8b94c8d-45b6-48bf-8524-7a980eada798"
+
+
 # Create your views here.
 
 class LoginView(APIView):
@@ -220,6 +222,29 @@ class LogoutView(APIView):
 
         except:
             return Response({"success": False, "message": "Token does not exist!"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class enableAndDisableNotifiacrionsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        try:
+            user_id = request.data["user_id"]
+        except:
+            return Response({"success": False, "message": "User id Not found"})
+        try:
+            if user_id == "":
+                request.user.onesignal_id = ""
+                request.user.save()
+                return Response({"success": True, "message": "Notifications is Disable."})
+            else:
+                request.user.onesignal_id = user_id
+                request.user.save()
+                return Response({"success": True, "message": "Notifications is Enable."})
+
+        except:
+            return Response({"success": False, "message": "Notifications Not change."})
 
 
 class RemoveWithSalatToFavView(APIView):
@@ -521,7 +546,7 @@ class update_masjid(APIView):
                            "contents": {"en": current_masjid.mosque_name + " time is now updated.",
                                         "ru": "Lorem ipsum dolor amit"},
                            "data": {"body": "Hello my friend! we added a new post!", "title": "New post", },
-                           "headings": {"en": "Your salat time Changed." }}
+                           "headings": {"en": "Your salat time Changed."}}
 
                 req = requests.post("https://onesignal.com/api/v1/notifications", headers=header,
                                     data=json.dumps(payload))
@@ -663,7 +688,8 @@ class create_masjid_date_list(APIView):
             newdate2 = time.strptime(date, "%Y-%m-%d")
             if newdate2 > newdate1:
                 print(current_date)
-                update_Salat_Time_List.objects.create(name=name, user_id=user, update_date=date, Fajr=fajr_date, Dhuhr=dhuhr_date,
+                update_Salat_Time_List.objects.create(name=name, user_id=user, update_date=date, Fajr=fajr_date,
+                                                      Dhuhr=dhuhr_date,
                                                       Asr=asr_date, Maghrib=maghrib_date, Isha=isha_date)
                 return Response({"success": True, "message": "Successful date save."},
                                 status=status.HTTP_202_ACCEPTED)
@@ -871,7 +897,7 @@ class send_push_notification(APIView):
 
             req = requests.post("https://onesignal.com/api/v1/notifications", headers=header,
                                 data=json.dumps(payload))
-            return Response({"success": True, "message": "Push Send Successful.","data":req.json()},
+            return Response({"success": True, "message": "Push Send Successful.", "data": req.json()},
                             status=status.HTTP_200_OK)
         except:
             print()
