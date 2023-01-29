@@ -7,5 +7,5 @@ def start():
     scheduler = BackgroundScheduler()
     scheduler.remove_all_jobs()
     scheduler.add_job(schedule_api, 'interval', minutes=2)
-    scheduler.add_job(updateMasjid, 'interval', hours=24)
+    scheduler.add_job(updateMasjid, 'interval', minutes=5)
     scheduler.start()

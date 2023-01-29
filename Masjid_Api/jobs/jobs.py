@@ -7,6 +7,7 @@ from Masjid_Api import models
 
 app_id = "c8b94c8d-45b6-48bf-8524-7a980eada798"
 def updateMasjid():
+    print("update masjid working")
     current_date = datetime.datetime.now().strftime('%Y-%m-%d')
     current_updated_date = models.update_Salat_Time_List.objects.filter(update_date=current_date, is_expired=False)
     if len(current_updated_date) != 0:
