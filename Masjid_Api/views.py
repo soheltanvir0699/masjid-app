@@ -686,7 +686,7 @@ class create_masjid_date_list(APIView):
             current_date = datetime.datetime.now().strftime('%Y-%m-%d')
             newdate1 = time.strptime(current_date, "%Y-%m-%d")
             newdate2 = time.strptime(date, "%Y-%m-%d")
-            if newdate2 > newdate1:
+            if newdate2 >= newdate1:
                 print(current_date)
                 update_Salat_Time_List.objects.create(name=name, user_id=user, update_date=date, Fajr=fajr_date,
                                                       Dhuhr=dhuhr_date,
