@@ -2,7 +2,7 @@ from django.contrib import auth
 from django.contrib.auth.hashers import make_password
 from django.db.models import Sum
 from rest_framework import serializers
-from .models import User_model, Salat_Time_List,Favorite_Time_List
+from .models import User_model, Salat_Time_List, Favorite_Time_List, update_Salat_Time_List
 
 
 class LoginSerializer(serializers.Serializer):
@@ -48,6 +48,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class Salat_Times_Serializer(serializers.ModelSerializer):
     is_add_fav = serializers.SerializerMethodField()
+
     class Meta:
         model = Salat_Time_List
         fields = '__all__'
@@ -60,11 +61,21 @@ class Salat_Times_Serializer(serializers.ModelSerializer):
         except:
             return False
 
+
+class Sch_Time_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = update_Salat_Time_List
+        fields = '__all__'
+
+
 class Fav_Serializer(serializers.ModelSerializer):
     salat_Id = serializers.SerializerMethodField()
+
     class Meta:
         model = Favorite_Time_List
         fields = '__all__'
+
     def get_salat_Id(self, obj):
-        data = Salat_Times_Serializer(Salat_Time_List.objects.filter(id=obj.salat_Id.id), context=self.context, many=True).data
+        data = Salat_Times_Serializer(Salat_Time_List.objects.filter(id=obj.salat_Id.id), context=self.context,
+                                      many=True).data
         return data

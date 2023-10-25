@@ -24,5 +24,10 @@ urlpatterns = [
     path(r'api/remove-masjid/', views.RemoveMasjidView.as_view(), name='removeMasjid'),
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
     path(r'api/remove-fav-fav/', views.RemoveWithFavToFavView.as_view(), name='removeFavFav'),
-
+    path(r'api/create-sch-masjid/', views.create_masjid_date_list.as_view(), name='create_masjid'),
+    path(r'api/start-sch/', views.startSch.as_view(), name='startSch'),
+    path(r'api/update_sch_masjid/', views.update_masjid_date_list.as_view(), name='updateSch'),
+    path(r'api/delete_sch_masjid/', views.delete_masjid_date_list.as_view(), name='deleteSch'),
+    path(r'api/update_timezone/', views.TimeZone_Times.as_view(), name='timezone'),
+    path(r'api/send_push_notifictions/', views.send_push_notification.as_view(), name='send_push_notification'),
 ]

@@ -9,16 +9,15 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
 from pathlib import Path
 import os
 from django.conf.global_settings import DATETIME_INPUT_FORMATS
+
 # for server
 import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -31,7 +30,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,14 +41,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Masjid_Api',
     'rest_framework',
+    'import_export',
     'rest_framework.authtoken',
-'cloudinary_storage',
-    'cloudinary',
+    # 'django.contrib.gis'
+    'cloudinary_storage',
+        'cloudinary',
 ]
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dcfwwuqqt',
-    'API_KEY': '554599143982113',
-    'API_SECRET': 'aHCcw3z4hUmopyST8ygOsni3rwY'
+    'CLOUD_NAME': 'hiqpdd1kx',
+    'API_KEY': '256524275114637',
+    'API_SECRET': '0hIeVmzGlnvQJ6x2xeX2-PDyYjE'
 }
 
 MIDDLEWARE = [
@@ -58,14 +58,13 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 ROOT_URLCONF = 'MasjidApp.urls'
-
 
 TEMPLATES = [
     {
@@ -91,9 +90,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 25
 }
-
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -104,6 +104,18 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
+# GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'NAME': 'dbisegok5cd6c0',
+#         'USER': 'hybjjxnnbrlmrx',
+#         'PASSWORD': '4f137f64ba132e9bc356f024613d0b50e7395d8ca07a6e803f6e3ae499327b01',
+#         'HOST': 'ec2-52-1-17-228.compute-1.amazonaws.com',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
@@ -123,7 +135,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

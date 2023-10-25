@@ -1,7 +1,6 @@
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-
 # Create your models here.
 from MasjidApp import settings
 
@@ -42,12 +41,15 @@ class User_model(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    onesignal_id = models.CharField(max_length=300, null=True, blank=True)
+    time_zone = models.CharField(max_length=100, null=True, blank=True)
     image = models.ImageField(upload_to='image/user_pic/%y/%m/%d', null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', ]
 
     object = MyAccountManager()
+    objects = MyAccountManager()
 
     def delete(self, *args, **kwargs):
         # first, delete the file
@@ -75,6 +77,33 @@ class User_model(AbstractBaseUser):
         return self.is_superuser
 
 
+class Country_List(models.Model):
+    country_name = models.CharField(max_length=100, unique=True, null=True)
+    time_zone = models.CharField(max_length=100, unique=True, null=True)
+
+    def __str__(self):
+        return self.country_name
+
+
+class update_Salat_Time_List(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
+    update_date = models.DateField(blank=False, null=False)
+    Fajr = models.TimeField(auto_created=False, blank=False, null=False)
+    Sunrise = models.TimeField(auto_created=False, blank=True, null=True)
+    Dhuhr = models.TimeField(auto_created=False, blank=False, null=False)
+    Asr = models.TimeField(auto_created=False, blank=False, null=False)
+    Sunset = models.TimeField(auto_created=False, blank=True, null=True)
+    Maghrib = models.TimeField(auto_created=False, blank=False, null=False)
+    Isha = models.TimeField(auto_created=False, blank=False, null=False)
+    Imsak = models.TimeField(auto_created=False, blank=True, null=True)
+    user_id = models.ForeignKey(User_model, on_delete=models.CASCADE, limit_choices_to={'is_creator': True},
+                                related_name="Salat_time_1")
+    is_expired = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user_id.name
+
+
 class Salat_Time_List(models.Model):
     mosque_name = models.CharField(max_length=200)
     mosque_icon = models.ImageField(null=True)
@@ -90,6 +119,10 @@ class Salat_Time_List(models.Model):
     Imsak = models.TimeField(auto_created=False, blank=True, null=True)
     create_at = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     update_at = models.DateTimeField(verbose_name='last updated', auto_now=True, null=True)
+    city = models.CharField(max_length=100, null=True)
+    state = models.CharField(max_length=100, null=True)
+    country = models.CharField(max_length=100, null=True)
+    address = models.CharField(max_length=250, null=True, blank=True)
 
     def __str__(self):
         return self.mosque_name
@@ -101,12 +134,24 @@ class Salat_Time_List(models.Model):
                 this.image.delete()
         except:
             pass
+
+        try:
+            self.address = self.state + ", " + self.city + ", " + self.country
+        except:
+            pass
+
+        # try:
+        #     self.location = Point(self.longitude, self.latitude)
+        #     super(Salat_Time_List, self).save(*args, **kwargs)
+        # except Exception as e:
+        #     pass
+
         super(Salat_Time_List, self).save(*args, **kwargs)
 
 
 class Favorite_Time_List(models.Model):
     salat_Id = models.ForeignKey(Salat_Time_List, on_delete=models.CASCADE,
-                                related_name="Salat_id")
+                                 related_name="Salat_id")
     user_id = models.ForeignKey(User_model, on_delete=models.CASCADE,
                                 related_name="user_id")
     is_default = models.BooleanField(default=False)
